@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Premium Hair Wigs & Extensions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Admin Dashboard</h1>
+                <p>Premium Hair Wigs & Extensions</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        autocomplete="email"
+                        placeholder="admin@premiumhairsa.co.za">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                        placeholder="Enter your password">
+                </div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p class="security-notice">
+                    <i class="fas fa-info-circle"></i>
+                    This is a secure admin area. All login attempts are monitored and logged.
+                </p>
+            </div>
+        </div>
+        
+        <div class="login-info">
+            <h2>🔒 Security Features</h2>
+            <ul>
+                <li><i class="fas fa-check"></i> JWT Token Authentication</li>
+                <li><i class="fas fa-check"></i> Password Hashing (bcrypt)</li>
+                <li><i class="fas fa-check"></i> Brute-force Protection</li>
+                <li><i class="fas fa-check"></i> Rate Limiting</li>
+                <li><i class="fas fa-check"></i> Activity Logging</li>
+                <li><i class="fas fa-check"></i> Session Management</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="js/config.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
