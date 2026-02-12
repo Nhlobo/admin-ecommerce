@@ -10,7 +10,7 @@ const ADMIN_CONFIG = {
     // Change this to your deployed backend URL
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
-        : 'https://premium-hair-backend.onrender.com',  // Production - UPDATE THIS!
+        : 'https://backend-ecommerce-ps2d.onrender.com',  // Production - UPDATED!
     
     // API Endpoints
     ENDPOINTS: {
@@ -92,7 +92,7 @@ async function authenticatedFetch(url, options = {}) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }
-    };
+    }; 
     
     const mergedOptions = {
         ...defaultOptions,
