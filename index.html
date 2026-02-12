@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Premium Hair Wigs & Extensions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="dashboard-page">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-crown"></i> Admin Dashboard</h2>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active" data-panel="overview">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Overview</span>
+            </a>
+            <a href="#orders" class="nav-item" data-panel="orders">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+            <a href="#payments" class="nav-item" data-panel="payments">
+                <i class="fas fa-credit-card"></i>
+                <span>Payments</span>
+            </a>
+            <a href="#customers" class="nav-item" data-panel="customers">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+            </a>
+            <a href="#products" class="nav-item" data-panel="products">
+                <i class="fas fa-box"></i>
+                <span>Products & Inventory</span>
+            </a>
+            <a href="#discounts" class="nav-item" data-panel="discounts">
+                <i class="fas fa-tags"></i>
+                <span>Discounts</span>
+            </a>
+            <a href="#returns" class="nav-item" data-panel="returns">
+                <i class="fas fa-undo"></i>
+                <span>Returns & Refunds</span>
+            </a>
+            <a href="#reports" class="nav-item" data-panel="reports">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports & Analytics</span>
+            </a>
+            <a href="#compliance" class="nav-item" data-panel="compliance">
+                <i class="fas fa-file-alt"></i>
+                <span>Compliance & Legal</span>
+            </a>
+            <a href="#logs" class="nav-item" data-panel="logs">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security & Logs</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="admin-info" id="adminInfo">
+                <i class="fas fa-user-circle"></i>
+                <span id="adminName">Loading...</span>
+            </div>
+            <button class="btn btn-danger btn-sm" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="topbar">
+            <button class="sidebar-toggle mobile-only" id="mobileSidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="pageTitle">Dashboard Overview</h1>
+            <div class="topbar-actions">
+                <button class="btn btn-icon" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="btn btn-icon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </header>
+        
+        <div class="content-area">
+            <!-- Overview Panel -->
+            <div id="overviewPanel" class="panel active">
+                <h2>Business Overview</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="ordersToday">0</h3>
+                            <p>Orders Today</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="revenueToday">R0.00</h3>
+                            <p>Revenue Today</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pendingOrders">0</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="lowStockProducts">0</h3>
+                            <p>Low Stock Alerts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-grid">
+                    <div class="panel-section">
+                        <h3>Recent Orders</h3>
+                        <div class="table-container">
+                            <table class="data-table" id="recentOrdersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order #</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentOrdersBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>Quick Actions</h3>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" onclick="showPanel('products')">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                            <button class="btn btn-primary" onclick="showPanel('discounts')">
+                                <i class="fas fa-tags"></i> Create Discount
+                            </button>
+                            <button class="btn btn-primary" onclick="showPanel('orders')">
+                                <i class="fas fa-search"></i> View All Orders
+                            </button>
+                            <button class="btn btn-primary" onclick="showPanel('reports')">
+                                <i class="fas fa-chart-bar"></i> View Reports
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orders Panel -->
+            <div id="ordersPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Orders Management</h2>
+                    <div class="panel-actions">
+                        <input type="text" placeholder="Search orders..." id="orderSearch" class="search-input">
+                        <select id="orderStatusFilter" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshOrders()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">Loading orders...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination" id="ordersPagination"></div>
+            </div>
+            
+            <!-- Payments Panel -->
+            <div id="paymentsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Payments Management</h2>
+                    <div class="panel-actions">
+                        <select id="paymentStatusFilter" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Failed</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshPayments()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="paymentsTable">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading payments...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Customers Panel -->
+            <div id="customersPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Customers Management</h2>
+                    <div class="panel-actions">
+                        <input type="text" placeholder="Search customers..." id="customerSearch" class="search-input">
+                        <button class="btn btn-primary" onclick="refreshCustomers()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading customers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Products Panel -->
+            <div id="productsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Products & Inventory</h2>
+                    <div class="panel-actions">
+                        <input type="text" placeholder="Search products..." id="productSearch" class="search-input">
+                        <select id="productCategoryFilter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="wigs">Wigs</option>
+                            <option value="extensions">Extensions</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                        <button class="btn btn-success" onclick="showAddProductModal()">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                        <button class="btn btn-primary" onclick="refreshProducts()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price (Incl VAT)</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading products...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Discounts Panel -->
+            <div id="discountsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Discounts & Promotions</h2>
+                    <div class="panel-actions">
+                        <button class="btn btn-success" onclick="showAddDiscountModal()">
+                            <i class="fas fa-plus"></i> Create Discount
+                        </button>
+                        <button class="btn btn-primary" onclick="refreshDiscounts()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="discountsTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Used</th>
+                                <th>Limit</th>
+                                <th>Expires</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="discountsTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center">Loading discounts...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Returns & Refunds Panel -->
+            <div id="returnsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Returns & Refunds</h2>
+                    <div class="panel-actions">
+                        <select id="returnStatusFilter" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="requested">Requested</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="received">Received</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshReturns()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="returnsTable">
+                        <thead>
+                            <tr>
+                                <th>Return #</th>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Requested</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="returnsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading returns...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Reports & Analytics Panel -->
+            <div id="reportsPanel" class="panel">
+                <h2>Reports & Analytics</h2>
+                
+                <div class="panel-grid">
+                    <div class="panel-section">
+                        <h3>Sales Report</h3>
+                        <div class="report-filters">
+                            <input type="date" id="salesStartDate" class="form-input">
+                            <input type="date" id="salesEndDate" class="form-input">
+                            <button class="btn btn-primary" onclick="generateSalesReport()">
+                                <i class="fas fa-chart-bar"></i> Generate
+                            </button>
+                        </div>
+                        <div id="salesReportData" class="report-data"></div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>Product Performance</h3>
+                        <button class="btn btn-primary" onclick="generateProductReport()">
+                            <i class="fas fa-chart-line"></i> View Top Products
+                        </button>
+                        <div id="productReportData" class="report-data"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compliance & Legal Panel -->
+            <div id="compliancePanel" class="panel">
+                <h2>Compliance & Legal</h2>
+                
+                <div class="panel-grid">
+                    <div class="panel-section">
+                        <h3>VAT Records</h3>
+                        <div class="report-filters">
+                            <input type="date" id="vatStartDate" class="form-input">
+                            <input type="date" id="vatEndDate" class="form-input">
+                            <button class="btn btn-primary" onclick="loadVATRecords()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="vatRecordsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Order #</th>
+                                        <th>Date</th>
+                                        <th>Subtotal</th>
+                                        <th>VAT</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vatRecordsBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">No records</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>Policy Documents</h3>
+                        <div id="policyDocuments" class="policy-list">
+                            <p>Loading policies...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security & Logs Panel -->
+            <div id="logsPanel" class="panel">
+                <h2>Security & Activity Logs</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="activity">Activity Logs</button>
+                    <button class="tab-btn" data-tab="security">Security Events</button>
+                </div>
+                
+                <div id="activityTab" class="tab-content active">
+                    <div class="panel-actions">
+                        <select id="activitySeverityFilter" class="filter-select">
+                            <option value="">All Severity</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshActivityLogs()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="activityLogsTable">
+                            <thead>
+                                <tr>
+                                    <th>Admin</th>
+                                    <th>Action</th>
+                                    <th>Entity</th>
+                                    <th>IP Address</th>
+                                    <th>Severity</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityLogsBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="securityTab" class="tab-content">
+                    <div class="panel-actions">
+                        <select id="securitySeverityFilter" class="filter-select">
+                            <option value="">All Severity</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshSecurityEvents()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="securityEventsTable">
+                            <thead>
+                                <tr>
+                                    <th>Event Type</th>
+                                    <th>Description</th>
+                                    <th>Severity</th>
+                                    <th>IP Address</th>
+                                    <th>Resolved</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="securityEventsBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading events...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+    
+    <script src="js/config.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
