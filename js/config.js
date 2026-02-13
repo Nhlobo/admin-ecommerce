@@ -83,7 +83,7 @@ async function authenticatedFetch(url, options = {}) {
     const token = localStorage.getItem(ADMIN_CONFIG.TOKEN_KEY);
     
     if (!token) {
-        window.location.href = '/login.html';
+        window.location.href = '/login';
         throw new Error('No authentication token found');
     }
     
@@ -110,7 +110,7 @@ async function authenticatedFetch(url, options = {}) {
         if (response.status === 401 || response.status === 403) {
             localStorage.removeItem(ADMIN_CONFIG.TOKEN_KEY);
             localStorage.removeItem(ADMIN_CONFIG.ADMIN_INFO_KEY);
-            window.location.href = '/login.html';
+            window.location.href = '/login';
             throw new Error('Unauthorized');
         }
         
