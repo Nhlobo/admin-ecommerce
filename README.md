@@ -59,11 +59,11 @@ admin-ecommerce/
 - Node.js >= 14.0.0
 - npm or yarn
 
-### Installation
+### Local Development
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/admin-ecommerce.git
+   git clone https://github.com/Nhlobo/admin-ecommerce.git
    cd admin-ecommerce
    ```
 
@@ -72,33 +72,24 @@ admin-ecommerce/
    npm install
    ```
 
-3. **Configure environment variables**:
+3. **Start the development server**:
    ```bash
-   cp .env.example .env
+   npm start
    ```
-   Edit `.env` and update with your settings.
-
-4. **Start the development server**:
+   
+   Or with nodemon for auto-reload:
    ```bash
    npm run dev
    ```
 
-5. **Access the dashboard**:
-   Open your browser to `http://localhost:3000`
+4. **Access the dashboard**:
+   - Open browser to: `http://localhost:3000`
+   - Login page: `http://localhost:3000/login`
+   - Dashboard: `http://localhost:3000/dashboard`
 
-### Production Build
+### Production Deployment
 
-To run in production mode:
-
-```bash
-npm start
-```
-
-Or with environment variable:
-
-```bash
-NODE_ENV=production npm start
-```
+See the [Deployment to Render](#-deployment-to-render) section below.
 
 ## 🔧 Configuration
 
@@ -116,7 +107,28 @@ const API_BASE_URL = 'https://your-backend-url.onrender.com';
 
 ## 🌐 Deployment to Render
 
-The admin dashboard is a static site that needs to be served with a simple web server. We'll use a Node.js Express server to serve the static files.
+### Quick Deployment (Recommended)
+
+This repository is configured for easy deployment to Render using `render.yaml`:
+
+1. **Push code to GitHub** (already done)
+2. **Go to Render Dashboard**: https://dashboard.render.com/
+3. **Click "New +"** → **"Blueprint"** or connect as a **"Web Service"**
+4. **Connect your repository**: `Nhlobo/admin-ecommerce`
+5. **Render auto-detects `render.yaml`** and configures everything
+6. **Click "Apply"** or "Create Web Service"
+7. **Done!** Your admin dashboard will be live at: `https://admin-ecommerce-o3id.onrender.com`
+
+### Backend Connection
+The admin dashboard connects to the backend API at:
+- **Development**: `http://localhost:3000`
+- **Production**: `https://backend-ecommerce-1-xp4b.onrender.com`
+
+Configuration is automatic via `js/config.js` which detects the environment.
+
+### Manual Deployment (Alternative)
+
+If you prefer manual configuration:
 
 ### Step 1: Prepare Admin for Deployment
 
@@ -209,13 +221,27 @@ app.listen(PORT, () => {
 7. **Wait for Deployment**
 8. **Your Admin Dashboard will be available at**: `https://premium-hair-admin.onrender.com`
 
+### Alternative: Deploy Using render.yaml
+
+This repository includes a `render.yaml` configuration file for easier deployment:
+
+1. **Connect Repository to Render**
+2. **Render will automatically detect the `render.yaml` file**
+3. **Configuration includes**:
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Environment: Node.js
+   - Environment Variables: `NODE_ENV=production`
+
+This is the **recommended method** as it ensures consistent deployments.
+
 ### Step 4: Update Backend CORS
 
 After deploying the admin, update your backend's CORS configuration to allow requests from the admin URL:
 
 In your backend `.env`:
 ```
-ADMIN_URL=https://premium-hair-admin.onrender.com
+ADMIN_URL=https://admin-ecommerce-o3id.onrender.com
 ```
 
 Update backend `server.js` CORS configuration:
@@ -224,7 +250,7 @@ app.use(cors({
     origin: [
         process.env.FRONTEND_URL,
         process.env.ADMIN_URL,
-        'https://premium-hair-admin.onrender.com'
+        'https://admin-ecommerce-o3id.onrender.com'
     ],
     credentials: true
 }));
