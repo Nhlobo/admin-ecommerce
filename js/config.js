@@ -7,6 +7,7 @@
 // For development: http://localhost:3000
 // For production: https://your-backend-url.onrender.com
 const ADMIN_CONFIG = {
+    API_PREFIX: '/api',
     // Change this to your deployed backend URL
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
@@ -78,6 +79,44 @@ function getApiUrl(endpoint) {
     return ADMIN_CONFIG.API_BASE_URL + endpoint;
 }
 
+function getAdminApiEndpoint(endpoint) {
+    if (!endpoint) return ADMIN_CONFIG.API_PREFIX;
+    if (endpoint.startsWith(`${ADMIN_CONFIG.API_PREFIX}/`)) return endpoint;
+    if (endpoint.startsWith('/')) return `${ADMIN_CONFIG.API_PREFIX}${endpoint}`;
+    return `${ADMIN_CONFIG.API_PREFIX}/${endpoint}`;
+}
+
+async function fetchWithRetry(url, options = {}, retryConfig = {}) {
+    const {
+        retries = 2,
+        retryDelayMs = 2000,
+        timeoutMs = 60000
+    } = retryConfig;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error) {
+            clearTimeout(timeoutId);
+
+            const isLastAttempt = attempt === retries;
+            if (isLastAttempt) {
+                throw error;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        }
+    }
+}
+
 // Helper function for authenticated fetch
 async function authenticatedFetch(url, options = {}) {
     const token = localStorage.getItem(ADMIN_CONFIG.TOKEN_KEY);
@@ -123,5 +162,11 @@ async function authenticatedFetch(url, options = {}) {
 
 // Export config (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { ADMIN_CONFIG, getApiUrl, authenticatedFetch };
+    module.exports = {
+        ADMIN_CONFIG,
+        getApiUrl,
+        getAdminApiEndpoint,
+        fetchWithRetry,
+        authenticatedFetch
+    };
 }

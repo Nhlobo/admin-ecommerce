@@ -7,11 +7,23 @@ const API_BASE = ADMIN_CONFIG.API_BASE_URL;
 let adminToken = null;
 let adminInfo = null;
 
+function setLoadingState(isLoading, message = 'Loading admin dashboard...') {
+    const overlay = document.getElementById('globalLoadingOverlay');
+    const loadingText = document.getElementById('globalLoadingText');
+    if (!overlay) return;
+
+    if (loadingText) {
+        loadingText.textContent = message;
+    }
+
+    overlay.classList.toggle('active', isLoading);
+}
+
 // ================================
 // INITIALIZATION
 // ================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication
     adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
@@ -25,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('adminName').textContent = adminInfo.fullName || adminInfo.email;
     }
     
+    setLoadingState(true, 'Connecting to admin services...');
+
     // Initialize dashboard
     initializeDashboard();
     
@@ -51,7 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Load initial data
-    loadDashboardOverview();
+    try {
+        await loadDashboardOverview();
+    } finally {
+        setLoadingState(false);
+    }
 });
 
 // ================================
@@ -59,23 +77,28 @@ document.addEventListener('DOMContentLoaded', () => {
 // ================================
 
 async function apiRequest(endpoint, options = {}) {
-    const url = `${API_BASE}${endpoint}`;
+    const apiEndpoint = getAdminApiEndpoint(endpoint);
+    const url = `${API_BASE}${apiEndpoint}`;
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`
     };
-    
+
     try {
-        const response = await fetch(url, {
+        const response = await fetchWithRetry(url, {
             ...options,
             headers: {
                 ...headers,
                 ...options.headers
             }
+        }, {
+            retries: 2,
+            retryDelayMs: 2000,
+            timeoutMs: 90000
         });
-        
-        const data = await response.json();
-        
+
+        const data = await response.json().catch(() => ({}));
+
         if (!response.ok) {
             if (response.status === 401) {
                 // Unauthorized - redirect to login
@@ -86,11 +109,14 @@ async function apiRequest(endpoint, options = {}) {
             }
             throw new Error(data.message || 'Request failed');
         }
-        
+
         return data;
     } catch (error) {
         console.error('API request error:', error);
-        showNotification(error.message, 'error');
+        const errorMessage = error.name === 'AbortError'
+            ? 'Server is waking up. Please wait and try again.'
+            : error.message;
+        showNotification(errorMessage, 'error');
         throw error;
     }
 }
@@ -100,11 +126,11 @@ async function apiRequest(endpoint, options = {}) {
 // ================================
 
 function initializeDashboard() {
-    // Show the overview panel by default
-    showPanel('overview');
+    // Show the overview panel by default without double-fetching data
+    showPanel('overview', { skipLoad: true });
 }
 
-function showPanel(panelName) {
+function showPanel(panelName, options = {}) {
     // Hide all panels
     document.querySelectorAll('.panel').forEach(panel => {
         panel.classList.remove('active');
@@ -141,7 +167,9 @@ function showPanel(panelName) {
     document.getElementById('pageTitle').textContent = titles[panelName] || 'Dashboard';
     
     // Load panel data
-    loadPanelData(panelName);
+    if (!options.skipLoad) {
+        loadPanelData(panelName);
+    }
 }
 
 function toggleSidebar() {
