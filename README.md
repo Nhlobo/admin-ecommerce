@@ -2,6 +2,27 @@
 
 This is the secure admin dashboard for managing the Premium Hair Wigs & Extensions e-commerce platform.
 
+## 🔄 Authentication Flow
+
+The admin dashboard implements a secure client-side authentication flow:
+
+1. **Initial Access**: When users first visit the site (`/`), they are presented with the login page
+2. **Login**: Users enter their credentials, which are verified against the backend API
+3. **Token Storage**: Upon successful authentication, a JWT token is stored in localStorage
+4. **Dashboard Access**: Authenticated users are redirected to `/dashboard` where they can access admin features
+5. **Token Validation**: All API requests include the JWT token for authentication
+6. **Session Management**: If the token expires or is invalid, users are automatically redirected to login
+
+### URL Structure
+
+- `/` or `/login` - Login page (default landing page)
+- `/dashboard` - Main admin dashboard (requires authentication)
+
+The Express server handles routing to ensure:
+- Unauthenticated users land on the login page
+- Static assets (CSS, JS) are served correctly
+- Browser refreshes work properly on any route
+
 ## 🚀 Features
 
 - 🔐 Secure JWT authentication
@@ -328,23 +349,41 @@ These are set in your backend `.env` file:
 
 ## 🔧 Troubleshooting
 
+### Immediate Redirect/Logout Issue (FIXED)
+**Symptom**: When opening the deployed link, the page opens but immediately redirects or kicks you out.
+
+**Root Cause**: URL path mismatch between server routes and JavaScript redirects. The JavaScript was trying to redirect to `/admin/login.html` and `/admin/index.html` which didn't exist in the server routing.
+
+**Solution Implemented**:
+1. Updated all redirect URLs in JavaScript files to use `/login` and `/dashboard`
+2. Fixed server routing order to serve correct pages at each route
+3. Implemented proper authentication flow with localStorage token management
+
+**If you still experience this issue**:
+- Clear browser localStorage: Open DevTools → Application → Local Storage → Clear
+- Hard refresh the page: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)
+- Verify the backend API URL in `js/config.js` is correct
+- Check browser console for any JavaScript errors
+
 ### Login Issues
 - Verify backend is running
-- Check API URL is correct
-- Confirm admin credentials
+- Check API URL is correct in `js/config.js`
+- Confirm admin credentials with backend admin
 - Check browser console for errors
+- Verify backend has proper CORS configuration
 
 ### API Connection Issues
-- Verify CORS is configured in backend
-- Check backend URL in admin config
-- Ensure backend is accessible
-- Check network tab in browser DevTools
+- Verify CORS is configured in backend to allow admin dashboard URL
+- Check backend URL in `js/config.js` matches your deployed backend
+- Ensure backend is accessible (test with curl or Postman)
+- Check network tab in browser DevTools for failed requests
 
 ### Dashboard Not Loading
-- Clear browser cache
-- Check console for errors
-- Verify all assets are loading
+- Clear browser cache and localStorage
+- Check console for JavaScript errors
+- Verify all assets are loading in Network tab
 - Check network connectivity
+- Ensure you have a valid authentication token
 
 ## 📞 Support
 
