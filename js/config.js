@@ -12,7 +12,9 @@ const ADMIN_CONFIG = {
     API_BASE_URL: (() => {
         const queryOverride = new URLSearchParams(window.location.search).get('apiBase');
         const savedOverride = localStorage.getItem('adminApiBaseUrl');
-        return queryOverride || savedOverride || window.location.origin;
+        const origin = window.location.origin;
+        const safeOrigin = origin && origin !== 'null' ? origin : 'https://backend-ecommerce-1-xp4b.onrender.com';
+        return queryOverride || savedOverride || safeOrigin;
     })(),
     
     // API Endpoints
