@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check authentication
     adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
-        window.location.href = '/admin/login.html';
+        window.location.href = '/login';
         return;
     }
     
@@ -81,7 +81,7 @@ async function apiRequest(endpoint, options = {}) {
                 // Unauthorized - redirect to login
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminInfo');
-                window.location.href = '/admin/login.html';
+                window.location.href = '/login';
                 return;
             }
             throw new Error(data.message || 'Request failed');
@@ -664,6 +664,6 @@ async function handleLogout() {
     } finally {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminInfo');
-        window.location.href = '/admin/login.html';
+        window.location.href = '/login';
     }
 }

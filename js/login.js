@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if already logged in
     const token = localStorage.getItem('adminToken');
     if (token) {
-        window.location.href = '/admin/index.html';
+        window.location.href = '/dashboard';
         return;
     }
     
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
             
             // Redirect to dashboard
-            window.location.href = '/admin/index.html';
+            window.location.href = '/dashboard';
             
         } catch (error) {
             console.error('Login error:', error);
