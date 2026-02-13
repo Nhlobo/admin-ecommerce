@@ -122,7 +122,7 @@ This repository is configured for easy deployment to Render using `render.yaml`:
 ### Backend Connection
 The admin dashboard connects to the backend API at:
 - **Development**: `http://localhost:3000`
-- **Production**: `https://backend-ecommerce-1-xp4b.onrender.com`
+- **Production**: `https://backend-ecommerce-3-2jsk.onrender.com`
 
 Configuration is automatic via `js/config.js` which detects the environment.
 
