@@ -1,6 +1,23 @@
 # Premium Hair Wigs & Extensions - Admin Dashboard
 
-This is the secure admin dashboard for managing the Premium Hair Wigs & Extensions e-commerce platform.
+This is the secure admin dashboard for managing the Premium Hair Wigs & Extensions e-commerce platform. This is a **standalone repository** that has been migrated from the [monorepo](https://github.com/Nhlobo/ecommerce) for independent deployment.
+
+## 📦 Repository Status
+
+✅ **Migration Complete** - All files have been migrated from the `admin-ecommerce/` directory of the monorepo to this standalone repository.
+
+### Related Repositories
+- **Backend API**: [Nhlobo/ecommerce-backend](https://github.com/Nhlobo/ecommerce-backend) (if exists)
+- **Customer Frontend**: [Nhlobo/ecommerce-frontend](https://github.com/Nhlobo/ecommerce-frontend) (if exists)
+- **Original Monorepo**: [Nhlobo/ecommerce](https://github.com/Nhlobo/ecommerce) (reference only)
+
+## 🏗️ Architecture
+
+The admin dashboard is a standalone web application that:
+- Serves as a secure management interface for the e-commerce platform
+- Communicates with the backend API (deployed separately)
+- Uses JWT authentication for secure access
+- Can be deployed independently on platforms like Render, Vercel, or Netlify
 
 ## 🔄 Authentication Flow
 
@@ -93,17 +110,41 @@ See the [Deployment to Render](#-deployment-to-render) section below.
 
 ## 🔧 Configuration
 
-Before deploying, you need to update the API endpoint configuration to point to your backend API.
+### Backend API Connection
 
-### Update API Configuration
-
-Create or update the API configuration in the JavaScript files:
-
-**In `js/login.js` and `js/admin.js`**, find the API base URL and update it:
+The admin dashboard needs to connect to the backend API. The API URL is configured in `js/config.js`:
 
 ```javascript
-const API_BASE_URL = 'https://your-backend-url.onrender.com';
+const ADMIN_CONFIG = {
+    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000'  // Development
+        : 'https://backend-ecommerce-3-2jsk.onrender.com',  // Production
+    // ... other config
+};
 ```
+
+**To update the backend URL:**
+1. Edit `js/config.js`
+2. Update the production URL in the `API_BASE_URL` field
+3. Replace `https://backend-ecommerce-3-2jsk.onrender.com` with your actual backend deployment URL
+
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Configure the following variables:
+
+- `NODE_ENV` - Set to `production` for production deployment
+- `PORT` - Server port (default: 3000)
+- `CORS_ORIGINS` - Comma-separated list of allowed origins
+- `RATE_LIMIT_WINDOW_MS` - Rate limiting window in milliseconds
+- `RATE_LIMIT_MAX_REQUESTS` - Maximum requests per window
+- `TRUST_PROXY` - Set to `true` when behind a reverse proxy (like Render)
+- `LOG_LEVEL` - Logging level (info, debug, error)
 
 ## 🌐 Deployment to Render
 
@@ -111,137 +152,70 @@ const API_BASE_URL = 'https://your-backend-url.onrender.com';
 
 This repository is configured for easy deployment to Render using `render.yaml`:
 
-1. **Push code to GitHub** (already done)
+1. **Push code to GitHub** (this repository)
 2. **Go to Render Dashboard**: https://dashboard.render.com/
-3. **Click "New +"** → **"Blueprint"** or connect as a **"Web Service"**
+3. **Click "New +"** → **"Blueprint"**
 4. **Connect your repository**: `Nhlobo/admin-ecommerce`
 5. **Render auto-detects `render.yaml`** and configures everything
-6. **Click "Apply"** or "Create Web Service"
-7. **Done!** Your admin dashboard will be live at: `https://admin-ecommerce-o3id.onrender.com`
+6. **Click "Apply"**
+7. **Done!** Your admin dashboard will be live
 
 ### Backend Connection
+
+**Important:** Make sure your backend API is deployed first and update `js/config.js` with the correct backend URL.
+
 The admin dashboard connects to the backend API at:
 - **Development**: `http://localhost:3000`
-- **Production**: `https://backend-ecommerce-3-2jsk.onrender.com`
+- **Production**: Update the URL in `js/config.js`
 
-Configuration is automatic via `js/config.js` which detects the environment.
+Configuration is automatic via `js/config.js` which detects the environment based on hostname.
 
-### Manual Deployment (Alternative)
+### Manual Deployment Steps
 
-If you prefer manual configuration:
+If you prefer manual configuration or deploying to a different platform:
 
-### Step 1: Prepare Admin for Deployment
+#### Step 1: Configure Backend URL
 
-1. **Create a simple Express server** to serve the admin files:
-
-Create `server.js` in the `admin-ecommerce` directory:
+Edit `js/config.js` and update the production API URL:
 
 ```javascript
-const express = require('express');
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Serve static files
-app.use(express.static(path.join(__dirname)));
-
-// Route all requests to index.html for SPA behavior
-app.get('*', (req, res) => {
-    if (req.path.endsWith('.html') || req.path.endsWith('.css') || req.path.endsWith('.js')) {
-        res.sendFile(path.join(__dirname, req.path));
-    } else {
-        res.sendFile(path.join(__dirname, 'login.html'));
-    }
-});
-
-app.listen(PORT, () => {
-    console.log(`Admin dashboard running on port ${PORT}`);
-});
+const ADMIN_CONFIG = {
+    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000'
+        : 'https://YOUR-BACKEND-URL.onrender.com',  // ← Update this
+    // ...
+};
 ```
 
-2. **Create `package.json`**:
-
-```json
-{
-  "name": "premium-hair-admin-dashboard",
-  "version": "1.0.0",
-  "description": "Admin Dashboard for Premium Hair E-commerce",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  }
-}
-```
-
-3. **Update API URLs**: Make sure all API calls in `js/login.js` and `js/admin.js` use your deployed backend URL.
-
-### Step 2: Push to GitHub
-
-1. **Create a new repository** for the admin:
-   ```bash
-   # In the admin-ecommerce directory
-   git init
-   git add .
-   git commit -m "Initial admin dashboard commit"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/ecommerce-admin.git
-   git push -u origin main
-   ```
-
-### Step 3: Deploy to Render
+#### Step 2: Deploy to Render
 
 1. **Go to Render Dashboard**: https://dashboard.render.com/
 2. **Click "New +"** and select **"Web Service"**
-3. **Connect Your Repository**:
-   - Select your `ecommerce-admin` repository
-   - Click "Connect"
+3. **Connect Your Repository**: Select `Nhlobo/admin-ecommerce`
 4. **Configure Web Service**:
-   - **Name**: `premium-hair-admin`
-   - **Region**: Same as backend
+   - **Name**: `premium-hair-admin` (or your preferred name)
+   - **Region**: Choose the same region as your backend
    - **Branch**: `main`
-   - **Root Directory**: Leave empty or set to `.`
+   - **Root Directory**: Leave empty
    - **Environment**: `Node`
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
    - **Plan**: Choose appropriate plan (Free tier available)
-5. **Add Environment Variables**:
+5. **Add Environment Variables** (optional):
    ```
    NODE_ENV=production
-   PORT=10000
-   BACKEND_URL=https://premium-hair-backend.onrender.com
+   TRUST_PROXY=true
    ```
 6. **Click "Create Web Service"**
 7. **Wait for Deployment**
-8. **Your Admin Dashboard will be available at**: `https://premium-hair-admin.onrender.com`
 
-### Alternative: Deploy Using render.yaml
-
-This repository includes a `render.yaml` configuration file for easier deployment:
-
-1. **Connect Repository to Render**
-2. **Render will automatically detect the `render.yaml` file**
-3. **Configuration includes**:
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-   - Environment: Node.js
-   - Environment Variables: `NODE_ENV=production`
-
-This is the **recommended method** as it ensures consistent deployments.
-
-### Step 4: Update Backend CORS
+#### Step 3: Update Backend CORS
 
 After deploying the admin, update your backend's CORS configuration to allow requests from the admin URL:
 
 In your backend `.env`:
 ```
-ADMIN_URL=https://admin-ecommerce-o3id.onrender.com
+ADMIN_URL=https://your-admin-url.onrender.com
 ```
 
 Update backend `server.js` CORS configuration:
@@ -249,12 +223,24 @@ Update backend `server.js` CORS configuration:
 app.use(cors({
     origin: [
         process.env.FRONTEND_URL,
-        process.env.ADMIN_URL,
-        'https://admin-ecommerce-o3id.onrender.com'
+        process.env.ADMIN_URL
     ],
     credentials: true
 }));
 ```
+
+### Alternative Deployment Platforms
+
+This application can also be deployed to:
+- **Vercel**: Static site deployment with serverless functions
+- **Netlify**: Static site deployment
+- **AWS**: EC2, Elastic Beanstalk, or S3 + CloudFront
+- **Heroku**: Web dyno deployment
+
+For these platforms, you may need to:
+1. Adjust the `package.json` scripts
+2. Add platform-specific configuration files
+3. Configure environment variables in the platform's dashboard
 
 ## 🔐 Security Features
 
