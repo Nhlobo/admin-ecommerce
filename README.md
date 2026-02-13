@@ -105,9 +105,14 @@ The API configuration is managed in `js/config.js` and automatically detects the
 To change the production backend URL, edit `js/config.js`:
 
 ```javascript
-API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'  // Development
-    : 'https://your-backend-url.onrender.com',  // Production - Update this URL
+const ADMIN_CONFIG = {
+    API_PREFIX: '/api',
+    // Update the production URL below
+    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000'  // Development
+        : 'https://your-backend-url.onrender.com',  // Production - Update this URL
+    // ... rest of config
+};
 ```
 
 ## 🌐 Deployment to Render
