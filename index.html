@@ -575,7 +575,14 @@
     
     <!-- Notification Toast -->
     <div id="notification" class="notification"></div>
-    
+    <div id="globalLoadingOverlay" class="global-loading-overlay" style="display: none;">
+        <div class="global-loading-card">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p id="globalLoadingText">Loading dashboard...</p>
+        </div>
+    </div>
+
+    <script src="js/runtime-config.js"></script>
     <script src="js/config.js"></script>
     <script src="js/admin.js"></script>
 </body>

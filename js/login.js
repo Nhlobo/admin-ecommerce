@@ -1,69 +1,80 @@
 /**
  * Admin Login Script
- * Handles authentication for admin dashboard
  */
 
-const API_BASE = ADMIN_CONFIG.API_BASE_URL;
+document.addEventListener('DOMContentLoaded', async () => {
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const loadingOverlay = document.getElementById('globalLoadingOverlay');
+    const loadingText = document.getElementById('globalLoadingText');
 
-document.addEventListener('DOMContentLoaded', () => {
+    const setLoading = (isLoading, text = 'Connecting securely...') => {
+        if (!loadingOverlay) return;
+        loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+        if (loadingText) loadingText.textContent = text;
+    };
+
     // Check if already logged in
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem(ADMIN_CONFIG.TOKEN_KEY);
     if (token) {
-        // If we have a token, redirect to dashboard
-        // Token validation will happen on the dashboard page
         window.location.href = '/dashboard';
         return;
     }
-    
-    // Handle login form
-    const loginForm = document.getElementById('loginForm');
-    const errorMessage = document.getElementById('errorMessage');
-    
+
+    // Warm up sleeping backend without exposing infra messages to admins
+    setLoading(true, 'Connecting to admin services...');
+    await waitForBackendWakeup();
+    setLoading(false);
+
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const email = document.getElementById('email').value;
+
+        const emailOrUsername = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        
-        // Clear previous errors
+
         errorMessage.style.display = 'none';
         errorMessage.textContent = '';
-        
-        // Disable submit button
+
         const submitBtn = loginForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-        
+        setLoading(true, 'Signing you in...');
+
         try {
-            const response = await fetch(`${API_BASE}/admin/login`, {
+            const response = await fetch(getApiUrl(ADMIN_CONFIG.ENDPOINTS.login), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({
+                    email: emailOrUsername,
+                    username: emailOrUsername,
+                    password
+                })
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
+                throw new Error(data.message || 'Login failed. Please check your credentials.');
             }
-            
-            // Store token and admin info
-            localStorage.setItem('adminToken', data.data.token);
-            localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
-            
-            // Redirect to dashboard
+
+            localStorage.setItem(ADMIN_CONFIG.TOKEN_KEY, data.data.token);
+            localStorage.setItem(ADMIN_CONFIG.ADMIN_INFO_KEY, JSON.stringify(data.data.admin));
+
             window.location.href = '/dashboard';
-            
         } catch (error) {
             console.error('Login error:', error);
-            errorMessage.textContent = error.message;
+            const friendlyMessage = error.message === 'Failed to fetch'
+                ? 'Unable to reach the server right now. Please wait a moment and try again.'
+                : error.message;
+
+            errorMessage.textContent = friendlyMessage;
             errorMessage.style.display = 'block';
-            
-            // Re-enable submit button
+
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            setLoading(false);
         }
     });
 });

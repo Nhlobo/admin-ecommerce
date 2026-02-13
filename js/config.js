@@ -1,127 +1,101 @@
 /**
  * Admin Dashboard Configuration
- * Configure the backend API URL here
+ * Runtime backend URL can be injected by server via /js/runtime-config.js
  */
 
-// Backend API Configuration
-// For development: http://localhost:3000
-// For production: https://your-backend-url.onrender.com
+function normalizeBaseUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    return url.replace(/\/+$/, '');
+}
+
+const runtimeApiBaseUrl = normalizeBaseUrl(window.__ADMIN_RUNTIME_CONFIG?.apiBaseUrl);
+const defaultApiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000'
+    : 'https://backend-ecommerce-1-xp4b.onrender.com';
+
 const ADMIN_CONFIG = {
-    // Change this to your deployed backend URL
-    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-1-xp4b.onrender.com',  // Production - UPDATED!
-    
-    // API Endpoints
+    API_BASE_URL: runtimeApiBaseUrl || defaultApiBaseUrl,
+
     ENDPOINTS: {
         login: '/api/admin/login',
         logout: '/api/admin/logout',
         verify: '/api/admin/verify',
-        
+
         // Dashboard
         dashboard: '/api/admin/dashboard',
         metrics: '/api/admin/metrics',
-        
+
         // Orders
         orders: '/api/admin/orders',
         orderById: (id) => `/api/admin/orders/${id}`,
         updateOrder: (id) => `/api/admin/orders/${id}`,
-        
+
         // Payments
         payments: '/api/admin/payments',
-        
+
         // Customers
         customers: '/api/admin/customers',
         customerById: (id) => `/api/admin/customers/${id}`,
-        
+
         // Products
         products: '/api/admin/products',
         productById: (id) => `/api/admin/products/${id}`,
-        
+
         // Discounts
         discounts: '/api/admin/discounts',
         discountById: (id) => `/api/admin/discounts/${id}`,
-        
+
         // Returns
         returns: '/api/admin/returns',
         returnById: (id) => `/api/admin/returns/${id}`,
-        
+
         // Reports
         reports: '/api/admin/reports',
         salesReport: '/api/admin/reports/sales',
         analytics: '/api/admin/reports/analytics',
-        
+
         // Compliance
         vatRecords: '/api/admin/compliance/vat',
         activityLogs: '/api/admin/compliance/activity-logs',
-        
+
         // Security
         securityEvents: '/api/admin/security/events',
         securityLogs: '/api/admin/security/logs'
     },
-    
-    // Application Settings
+
     TOKEN_KEY: 'adminToken',
     ADMIN_INFO_KEY: 'adminInfo',
-    TOKEN_EXPIRES_HOURS: 24,
-    
-    // Request Configuration
-    REQUEST_TIMEOUT: 30000, // 30 seconds
-    
-    // Pagination
-    DEFAULT_PAGE_SIZE: 20,
-    MAX_PAGE_SIZE: 100
+    REQUEST_TIMEOUT: 30000,
+    WAKEUP_MAX_ATTEMPTS: 5,
+    WAKEUP_RETRY_DELAY_MS: 2500
 };
 
-// Helper function to get full API URL
 function getApiUrl(endpoint) {
     return ADMIN_CONFIG.API_BASE_URL + endpoint;
 }
 
-// Helper function for authenticated fetch
-async function authenticatedFetch(url, options = {}) {
-    const token = localStorage.getItem(ADMIN_CONFIG.TOKEN_KEY);
-    
-    if (!token) {
-        window.location.href = '/login';
-        throw new Error('No authentication token found');
-    }
-    
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    }; 
-    
-    const mergedOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...options.headers
-        }
-    };
-    
-    try {
-        const response = await fetch(url, mergedOptions);
-        
-        // If unauthorized, redirect to login
-        if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem(ADMIN_CONFIG.TOKEN_KEY);
-            localStorage.removeItem(ADMIN_CONFIG.ADMIN_INFO_KEY);
-            window.location.href = '/login';
-            throw new Error('Unauthorized');
-        }
-        
-        return response;
-    } catch (error) {
-        console.error('API Request Error:', error);
-        throw error;
-    }
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Export config (if using modules)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { ADMIN_CONFIG, getApiUrl, authenticatedFetch };
+async function waitForBackendWakeup() {
+    const wakeupEndpoint = getApiUrl(ADMIN_CONFIG.ENDPOINTS.verify);
+
+    for (let attempt = 1; attempt <= ADMIN_CONFIG.WAKEUP_MAX_ATTEMPTS; attempt += 1) {
+        try {
+            // verify usually returns 401 without token, which still confirms backend is awake
+            const response = await fetch(wakeupEndpoint, { method: 'GET' });
+            if (response.ok || response.status === 401 || response.status === 403) {
+                return true;
+            }
+        } catch (error) {
+            // keep retrying for sleeping server startup
+        }
+
+        if (attempt < ADMIN_CONFIG.WAKEUP_MAX_ATTEMPTS) {
+            await sleep(ADMIN_CONFIG.WAKEUP_RETRY_DELAY_MS);
+        }
+    }
+
+    return false;
 }
