@@ -145,6 +145,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
             
+            // Validate response data
+            if (!data.data || !data.data.token || !data.data.admin) {
+                throw new Error('Invalid response from server. Please try again or contact support.');
+            }
+            
             // Store token and admin info
             localStorage.setItem('adminToken', data.data.token);
             localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
