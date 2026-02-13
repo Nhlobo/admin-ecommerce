@@ -42,11 +42,62 @@ The Express server handles routing to ensure:
 admin-ecommerce/
 ├── index.html          # Main admin dashboard
 ├── login.html          # Admin login page
+├── server.js           # Express server with security
+├── package.json        # Dependencies
+├── .env.example        # Environment variables template
 ├── css/
 │   └── admin.css       # Admin dashboard styles
 └── js/
+    ├── config.js       # API configuration
     ├── login.js        # Login authentication
     └── admin.js        # Dashboard functionality
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js >= 14.0.0
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/admin-ecommerce.git
+   cd admin-ecommerce
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**:
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and update with your settings.
+
+4. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Access the dashboard**:
+   Open your browser to `http://localhost:3000`
+
+### Production Build
+
+To run in production mode:
+
+```bash
+npm start
+```
+
+Or with environment variable:
+
+```bash
+NODE_ENV=production npm start
 ```
 
 ## 🔧 Configuration
@@ -179,7 +230,37 @@ app.use(cors({
 }));
 ```
 
-## 🔐 Security Best Practices
+## 🔐 Security Features
+
+This application implements multiple layers of security:
+
+### Server-Level Security
+- **Helmet.js**: Adds security headers (CSP, X-Frame-Options, etc.)
+- **CORS**: Configurable cross-origin resource sharing
+- **Rate Limiting**: Prevents brute force and DDoS attacks
+- **Request Body Parsing**: Size limits to prevent DoS
+- **Static File Security**: Blocks access to sensitive files (.env, package.json, etc.)
+- **Graceful Shutdown**: Proper cleanup on termination
+
+### Application Security
+- **Environment Variables**: Sensitive configuration kept out of code
+- **Input Validation**: All user inputs validated
+- **Logging**: Request/response logging with timestamps
+- **Error Handling**: Global error handler with proper logging
+- **Health Check**: Endpoint for monitoring application status
+
+### Authentication & Authorization
+- This is a **frontend-only** application serving static files
+- All authentication and authorization is handled by the **backend API**
+- JWT tokens are stored in localStorage and sent with each API request
+- The backend API implements:
+  - Rate limiting on API endpoints
+  - Brute force protection for login attempts
+  - Token expiration and validation
+  - Secure password hashing (bcrypt)
+  - Activity logging and monitoring
+
+### Security Best Practices
 
 ### 1. Change Default Admin Password
 After first login, immediately change the default admin password in the backend.
