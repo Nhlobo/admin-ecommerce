@@ -24,6 +24,9 @@ function setLoadingState(isLoading, message = 'Loading admin dashboard...') {
 // ================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const RETRY_RELOAD_DELAY_MS = 5000;
+    const ERROR_REDIRECT_DELAY_MS = 2000;
+    
     // Check authentication
     adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
@@ -39,36 +42,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     setLoadingState(true, 'Connecting to admin services...');
 
-    // Initialize dashboard
-    initializeDashboard();
-    
-    // Event listeners
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-    document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-    document.getElementById('mobileSidebarToggle').addEventListener('click', toggleSidebar);
-    
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const panel = item.dataset.panel;
-            showPanel(panel);
-        });
-    });
-    
-    // Tabs
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            switchTab(tab);
-        });
-    });
-    
-    // Load initial data
+    // Verify token and check backend availability
     try {
+        const verifyResponse = await fetchWithRetry(`${API_BASE}/api/admin/verify`, {
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        }, {
+            retries: 3,
+            retryDelayMs: 3000,
+            timeoutMs: 90000
+        });
+        
+        if (!verifyResponse.ok) {
+            // Token invalid, redirect to login
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminInfo');
+            window.location.href = '/login';
+            return;
+        }
+        
+        // Initialize dashboard
+        initializeDashboard();
+        
+        // Event listeners
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+        document.getElementById('mobileSidebarToggle').addEventListener('click', toggleSidebar);
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const panel = item.dataset.panel;
+                showPanel(panel);
+            });
+        });
+        
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                switchTab(tab);
+            });
+        });
+        
+        // Load initial data
         await loadDashboardOverview();
-    } finally {
+        
         setLoadingState(false);
+    } catch (error) {
+        console.error('Dashboard initialization error:', error);
+        setLoadingState(false);
+        
+        if (error.message.includes('timeout') || error.name === 'AbortError') {
+            showNotification('Server is starting up. Please wait a moment...', 'warning');
+            // Retry after delay
+            setTimeout(() => window.location.reload(), RETRY_RELOAD_DELAY_MS);
+        } else {
+            showNotification('Connection error. Redirecting to login...', 'error');
+            setTimeout(() => {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminInfo');
+                window.location.href = '/login';
+            }, ERROR_REDIRECT_DELAY_MS);
+        }
     }
 });
 

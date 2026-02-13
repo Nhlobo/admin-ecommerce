@@ -87,11 +87,15 @@ function getAdminApiEndpoint(endpoint) {
 }
 
 async function fetchWithRetry(url, options = {}, retryConfig = {}) {
+    const MAX_RETRY_DELAY_MS = 10000;
     const {
-        retries = 2,
-        retryDelayMs = 2000,
-        timeoutMs = 60000
+        retries = 3, // Increase default retries
+        retryDelayMs: initialRetryDelayMs = 3000, // Longer delay for Render wakeup
+        timeoutMs = 90000
     } = retryConfig;
+
+    let lastError;
+    let retryDelayMs = initialRetryDelayMs;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
         const controller = new AbortController();
@@ -106,15 +110,23 @@ async function fetchWithRetry(url, options = {}, retryConfig = {}) {
             return response;
         } catch (error) {
             clearTimeout(timeoutId);
-
-            const isLastAttempt = attempt === retries;
-            if (isLastAttempt) {
+            lastError = error;
+            
+            // Don't retry on client-side errors or auth failures
+            if (error.name !== 'AbortError' && !error.message.includes('timeout')) {
                 throw error;
             }
-
-            await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+            
+            if (attempt < retries) {
+                console.log(`Retry attempt ${attempt + 1}/${retries} after ${retryDelayMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+                // Increase delay for subsequent attempts (exponential backoff)
+                retryDelayMs = Math.min(retryDelayMs * 1.5, MAX_RETRY_DELAY_MS);
+            }
         }
     }
+    
+    throw lastError || new Error('Failed to connect after multiple retries');
 }
 
 // Helper function for authenticated fetch
