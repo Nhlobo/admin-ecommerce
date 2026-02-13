@@ -10,7 +10,7 @@ const ADMIN_CONFIG = {
     // Change this to your deployed backend URL
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-ps2d.onrender.com',  // Production - UPDATED!
+        : 'https://backend-ecommerce-1-xp4b.onrender.com',  // Production - UPDATED!
     
     // API Endpoints
     ENDPOINTS: {
