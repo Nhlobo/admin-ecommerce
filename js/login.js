@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if already logged in
     const token = localStorage.getItem('adminToken');
     if (token) {
+        // If we have a token, redirect to dashboard
+        // Token validation will happen on the dashboard page
         window.location.href = '/dashboard';
         return;
     }
