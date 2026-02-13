@@ -6,6 +6,9 @@ function Checkout() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -37,6 +40,7 @@ function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
       const orderData = {
@@ -53,19 +57,39 @@ function Checkout() {
         // Clear cart
         localStorage.removeItem('cart');
         
-        // Show success message
-        alert(`Order placed successfully! Order Number: ${response.data.order_number}`);
+        // Dispatch custom event to update cart count
+        window.dispatchEvent(new Event('cartUpdated'));
         
-        // Redirect to home or order confirmation
-        navigate('/');
+        // Set success state
+        setSuccess(true);
+        setOrderNumber(response.data.order_number);
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Failed to place order. Please try again.');
+      setError('Failed to place order. Please check your information and try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Show success message
+  if (success) {
+    return (
+      <div className="checkout-page">
+        <div className="container">
+          <div className="success-message">
+            <i className="fas fa-check-circle"></i>
+            <h1>Order Placed Successfully!</h1>
+            <p>Your order number is: <strong>{orderNumber}</strong></p>
+            <p>We'll send you an email confirmation shortly.</p>
+            <Link to="/" className="btn btn-primary">
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="checkout-page">
@@ -153,6 +177,12 @@ function Checkout() {
                 <option value="cash_on_delivery">Cash on Delivery</option>
               </select>
             </div>
+
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i> {error}
+              </div>
+            )}
 
             <button 
               type="submit" 

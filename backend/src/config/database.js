@@ -315,8 +315,8 @@ async function addSampleData() {
     // Sample payment
     await runQuery(
         `INSERT INTO payments (id, order_id, order_number, customer_name, amount, payment_method, status, transaction_id)
-         VALUES (?, ?, ?, ?, 999.99, 'credit_card', 'completed', 'TXN-${Date.now()}')`,
-        [uuidv4(), orderId, orderNumber, 'John Doe']
+         VALUES (?, ?, ?, ?, 999.99, 'credit_card', 'completed', ?)`,
+        [uuidv4(), orderId, orderNumber, 'John Doe', `TXN-${Date.now()}`]
     );
 
     console.log('✅ Sample data added successfully');

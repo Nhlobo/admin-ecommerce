@@ -48,7 +48,11 @@ function ProductDetail() {
     }
     
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Product added to cart!');
+    
+    // Dispatch custom event to update cart count in header
+    window.dispatchEvent(new Event('cartUpdated'));
+    
+    // Navigate to cart
     navigate('/cart');
   };
 
