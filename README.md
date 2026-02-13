@@ -394,10 +394,33 @@ For issues or questions:
 
 ## 🔐 Security Notes
 
+### Authentication & Authorization
+- This is a **frontend-only** application serving static files
+- All authentication and authorization is handled by the **backend API**
+- JWT tokens are stored in localStorage and sent with each API request
+- The backend API implements:
+  - Rate limiting on API endpoints
+  - Brute force protection for login attempts
+  - Token expiration and validation
+  - Secure password hashing (bcrypt)
+  - Activity logging and monitoring
+
+### Frontend Security Best Practices
 - Never commit sensitive credentials to Git
 - Use environment variables for API URLs
-- Keep dependencies updated
-- Monitor security logs regularly
+- Keep dependencies updated regularly
+- Clear tokens from localStorage on logout
+- Monitor security logs through the admin dashboard
+- Use HTTPS in production (automatically provided by Render)
+- Enable strong passwords for admin accounts
+- Enable 2FA when available in the backend
+
+### Note on Rate Limiting
+The Express server serving this frontend does not implement rate limiting on static file routes, as:
+1. This is a static file server, not an API
+2. All authentication and rate limiting is handled by the backend API
+3. Static assets (CSS, JS, HTML) need to load quickly without restrictions
+4. The backend API has proper rate limiting on all authentication and data endpoints
 - Use strong passwords
 - Enable 2FA when available
 
