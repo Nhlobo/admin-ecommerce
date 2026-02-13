@@ -93,16 +93,21 @@ See the [Deployment to Render](#-deployment-to-render) section below.
 
 ## 🔧 Configuration
 
-Before deploying, you need to update the API endpoint configuration to point to your backend API.
+The admin dashboard is configured to automatically detect the environment and connect to the appropriate backend API.
 
-### Update API Configuration
+### API Configuration (Automatic)
 
-Create or update the API configuration in the JavaScript files:
+The API configuration is managed in `js/config.js` and automatically detects the environment:
 
-**In `js/login.js` and `js/admin.js`**, find the API base URL and update it:
+- **Development** (localhost): Connects to `http://localhost:3000`
+- **Production** (deployed): Connects to `https://backend-ecommerce-3-2jsk.onrender.com`
+
+To change the production backend URL, edit `js/config.js`:
 
 ```javascript
-const API_BASE_URL = 'https://your-backend-url.onrender.com';
+API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000'  // Development
+    : 'https://your-backend-url.onrender.com',  // Production - Update this URL
 ```
 
 ## 🌐 Deployment to Render
@@ -177,10 +182,9 @@ app.listen(PORT, () => {
   "engines": {
     "node": ">=14.0.0"
   }
-}
 ```
 
-3. **Update API URLs**: Make sure all API calls in `js/login.js` and `js/admin.js` use your deployed backend URL.
+3. **Configure Backend URL**: If needed, update the production backend URL in `js/config.js` (automatic environment detection is already configured).
 
 ### Step 2: Push to GitHub
 
