@@ -155,7 +155,9 @@ app.get('/dashboard', (req, res) => {
 // ============================================
 // Block access to sensitive files before serving static files
 app.use((req, res, next) => {
-    const filename = path.basename(req.path);
+    // Normalize the path to prevent directory traversal
+    const normalizedPath = path.normalize(req.path);
+    const filename = path.basename(normalizedPath);
     const sensitiveFiles = ['.env', '.env.local', '.env.development', '.env.production', 
                            '.env.test', 'package.json', 'package-lock.json', 
                            'server.js', '.git'];
