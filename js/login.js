@@ -66,9 +66,7 @@ async function checkServerHealth() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Hide login form initially
-    const loginFormContainer = document.getElementById('loginFormContainer');
-    loginFormContainer.style.display = 'none';
+    // Login form container is already hidden via inline style in HTML
     
     // Check if already logged in
     const token = localStorage.getItem('adminToken');

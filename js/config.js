@@ -87,6 +87,7 @@ function getAdminApiEndpoint(endpoint) {
 }
 
 async function fetchWithRetry(url, options = {}, retryConfig = {}) {
+    const MAX_RETRY_DELAY_MS = 10000;
     const {
         retries = 3, // Increase default retries
         retryDelayMs: initialRetryDelayMs = 3000, // Longer delay for Render wakeup
@@ -120,7 +121,7 @@ async function fetchWithRetry(url, options = {}, retryConfig = {}) {
                 console.log(`Retry attempt ${attempt + 1}/${retries} after ${retryDelayMs}ms...`);
                 await new Promise(resolve => setTimeout(resolve, retryDelayMs));
                 // Increase delay for subsequent attempts (exponential backoff)
-                retryDelayMs = Math.min(retryDelayMs * 1.5, 10000);
+                retryDelayMs = Math.min(retryDelayMs * 1.5, MAX_RETRY_DELAY_MS);
             }
         }
     }

@@ -24,6 +24,9 @@ function setLoadingState(isLoading, message = 'Loading admin dashboard...') {
 // ================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const RETRY_RELOAD_DELAY_MS = 5000;
+    const ERROR_REDIRECT_DELAY_MS = 2000;
+    
     // Check authentication
     adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
@@ -95,14 +98,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error.message.includes('timeout') || error.name === 'AbortError') {
             showNotification('Server is starting up. Please wait a moment...', 'warning');
             // Retry after delay
-            setTimeout(() => window.location.reload(), 5000);
+            setTimeout(() => window.location.reload(), RETRY_RELOAD_DELAY_MS);
         } else {
             showNotification('Connection error. Redirecting to login...', 'error');
             setTimeout(() => {
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminInfo');
                 window.location.href = '/login';
-            }, 2000);
+            }, ERROR_REDIRECT_DELAY_MS);
         }
     }
 });
