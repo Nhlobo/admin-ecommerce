@@ -153,21 +153,28 @@ app.get('/dashboard', (req, res) => {
 // ============================================
 // Static File Serving with Security
 // ============================================
+// Block access to sensitive files before serving static files
+app.use((req, res, next) => {
+    const filename = path.basename(req.path);
+    const sensitiveFiles = ['.env', '.env.local', '.env.development', '.env.production', 
+                           '.env.test', 'package.json', 'package-lock.json', 
+                           'server.js', '.git'];
+    
+    // Check if request is for a sensitive file or filename starts with .env
+    if (sensitiveFiles.includes(filename) || filename.startsWith('.env')) {
+        console.warn(`⚠️  Blocked access to sensitive file: ${req.path} from IP: ${req.ip}`);
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+    
+    next();
+});
+
 // Serve static files (CSS, JS, images) from current directory
 // Note: In production, consider serving these from a CDN or dedicated static server
 app.use(express.static(path.join(__dirname), {
     maxAge: NODE_ENV === 'production' ? '1d' : 0,
     etag: true,
-    lastModified: true,
-    setHeaders: (res, filePath) => {
-        // Prevent serving sensitive files
-        const filename = path.basename(filePath);
-        if (filename === '.env' || filename.startsWith('.env.') || 
-            filename === 'package.json' || filename === 'package-lock.json' ||
-            filename === 'server.js') {
-            res.status(403).end();
-        }
-    }
+    lastModified: true
 }));
 
 // ============================================
