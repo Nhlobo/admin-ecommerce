@@ -11,7 +11,7 @@ const ADMIN_CONFIG = {
     // Change this to your deployed backend URL
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-1-xp4b.onrender.com',  // Production - UPDATED!
+        : 'https://backend-ecommerce-3-2jsk.onrender.com',  // Production - CORRECTED URL
     
     // API Endpoints
     ENDPOINTS: {
@@ -73,6 +73,9 @@ const ADMIN_CONFIG = {
     DEFAULT_PAGE_SIZE: 20,
     MAX_PAGE_SIZE: 100
 };
+
+// Log backend URL for verification
+console.log('🔗 Admin Dashboard connecting to backend:', ADMIN_CONFIG.API_BASE_URL);
 
 // Helper function to get full API URL
 function getApiUrl(endpoint) {
