@@ -65,6 +65,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize dashboard
         initializeDashboard();
         
+        // Setup session timeout
+        AdminAuth.setupSessionTimeout();
+        
+        // Apply role-based restrictions
+        AdminAuth.applyRoleRestrictions();
+        
         // Event listeners
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
@@ -115,42 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ================================
 
 async function apiRequest(endpoint, options = {}) {
-    const apiEndpoint = getAdminApiEndpoint(endpoint);
-    const url = `${API_BASE}${apiEndpoint}`;
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`
-    };
-
     try {
-        const response = await fetchWithRetry(url, {
-            ...options,
-            headers: {
-                ...headers,
-                ...options.headers
-            }
-        }, {
-            retries: 2,
-            retryDelayMs: 2000,
-            timeoutMs: 90000
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                // Unauthorized - redirect to login
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('adminInfo');
-                window.location.href = '/login';
-                return;
-            }
-            throw new Error(data.message || 'Request failed');
-        }
-
-        return data;
+        return await API.request(endpoint, options);
     } catch (error) {
-        console.error('API request error:', error);
         const errorMessage = error.name === 'AbortError'
             ? 'Server is waking up. Please wait and try again.'
             : error.message;
@@ -230,13 +203,7 @@ function switchTab(tabName) {
 }
 
 function showNotification(message, type = 'info') {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.className = `notification ${type} show`;
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
+    Notifications.show(message, type);
 }
 
 // ================================
@@ -723,13 +690,5 @@ function generateProductReport() {
 // ================================
 
 async function handleLogout() {
-    try {
-        await apiRequest('/admin/logout', { method: 'POST' });
-    } catch (error) {
-        console.error('Logout error:', error);
-    } finally {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminInfo');
-        window.location.href = '/login';
-    }
+    await AdminAuth.logout();
 }
