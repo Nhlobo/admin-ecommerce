@@ -90,7 +90,7 @@ const CompliancePanel = {
             this.currentVATFilters.dateFrom = dateFromInput.value;
         }
         if (dateToInput) {
-            dateTo.value = dateTo.toISOString().split('T')[0];
+            dateToInput.value = dateTo.toISOString().split('T')[0];
             this.currentVATFilters.dateTo = dateToInput.value;
         }
         

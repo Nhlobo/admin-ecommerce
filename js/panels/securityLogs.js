@@ -289,5 +289,3 @@ window.exportActivityLogs = () => SecurityLogsPanel.exportActivityLogs();
 window.exportSecurityEvents = () => SecurityLogsPanel.exportSecurityEvents();
 window.SecurityLogsPanel = SecurityLogsPanel;
 
-window.refreshSecurityEvents = () => SecurityLogsPanel.loadSecurityEvents();
-window.SecurityLogsPanel = SecurityLogsPanel;

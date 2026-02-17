@@ -385,10 +385,18 @@ const OverviewPanel = {
      * Setup auto-refresh
      */
     setupRefresh() {
-        // Refresh every 5 minutes
+        // Refresh stats every 1 minute
         setInterval(() => {
             this.loadData();
-            this.loadChartData();
+        }, 60000);
+        
+        // Refresh charts every 5 minutes (less frequently due to heavier data)
+        setInterval(() => {
+            // Only refresh if the overview panel is visible
+            const panel = document.getElementById('overviewPanel');
+            if (panel && panel.classList.contains('active')) {
+                this.loadChartData();
+            }
         }, 300000);
     },
     
