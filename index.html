@@ -528,44 +528,87 @@
             
             <!-- Compliance & Legal Panel -->
             <div id="compliancePanel" class="panel">
-                <h2>Compliance & Legal</h2>
+                <div class="panel-header">
+                    <h2>Compliance & Legal</h2>
+                </div>
                 
-                <div class="panel-grid">
-                    <div class="panel-section">
-                        <h3>VAT Records</h3>
+                <div class="panel-section">
+                    <h3>VAT Reporting</h3>
+                    
+                    <!-- VAT Report Controls -->
+                    <div class="vat-controls">
                         <div class="report-filters">
-                            <input type="date" id="vatStartDate" class="form-input">
-                            <input type="date" id="vatEndDate" class="form-input">
-                            <button class="btn btn-primary" onclick="loadVATRecords()">
-                                <i class="fas fa-search"></i> Search
+                            <select id="vatReportType" class="filter-select">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="annually">Annually</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <input type="date" id="vatDateFrom" class="form-input" placeholder="From Date">
+                            <input type="date" id="vatDateTo" class="form-input" placeholder="To Date">
+                            <button class="btn btn-primary" onclick="CompliancePanel.loadVATRecords()">
+                                <i class="fas fa-search"></i> Generate Report
                             </button>
                         </div>
-                        <div class="table-container">
-                            <table class="data-table" id="vatRecordsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice #</th>
-                                        <th>Order #</th>
-                                        <th>Date</th>
-                                        <th>Subtotal</th>
-                                        <th>VAT</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="vatRecordsBody">
-                                    <tr>
-                                        <td colspan="6" class="text-center">No records</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="export-buttons">
+                            <button class="btn btn-success" onclick="exportVATReportCSV()">
+                                <i class="fas fa-file-csv"></i> Export CSV
+                            </button>
+                            <button class="btn btn-danger" onclick="exportVATReportPDF()">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="panel-section">
-                        <h3>Policy Documents</h3>
-                        <div id="policyDocuments" class="policy-list">
-                            <p>Loading policies...</p>
+                    <!-- VAT Summary Statistics -->
+                    <div id="vatSummaryStats" class="vat-summary">
+                        <div class="vat-stat-card">
+                            <div class="vat-stat-label">Total Sales (Excl VAT)</div>
+                            <div class="vat-stat-value">R0.00</div>
                         </div>
+                        <div class="vat-stat-card">
+                            <div class="vat-stat-label">Total VAT Collected</div>
+                            <div class="vat-stat-value">R0.00</div>
+                        </div>
+                        <div class="vat-stat-card">
+                            <div class="vat-stat-label">Total Sales (Incl VAT)</div>
+                            <div class="vat-stat-value">R0.00</div>
+                        </div>
+                        <div class="vat-stat-card">
+                            <div class="vat-stat-label">Transaction Count</div>
+                            <div class="vat-stat-value">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- VAT Records Table -->
+                    <div class="table-container">
+                        <table class="data-table" id="vatRecordsTable">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Subtotal</th>
+                                    <th>VAT</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vatRecordsBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">No records</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <h3>Policy Documents</h3>
+                    <div id="policyDocuments" class="policy-list">
+                        <p>Loading policies...</p>
                     </div>
                 </div>
             </div>

@@ -1561,3 +1561,92 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* VAT Compliance Panel Styles */
+.vat-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.report-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.vat-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.vat-stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.vat-stat-card:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.vat-stat-card:nth-child(3) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.vat-stat-card:nth-child(4) {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.vat-stat-label {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.vat-stat-value {
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .vat-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .report-filters {
+        flex-direction: column;
+    }
+    
+    .report-filters input,
+    .report-filters select,
+    .report-filters button {
+        width: 100%;
+    }
+    
+    .export-buttons {
+        width: 100%;
+    }
+    
+    .export-buttons button {
+        flex: 1;
+    }
+    
+    .vat-summary {
+        grid-template-columns: 1fr;
+    }
+}
