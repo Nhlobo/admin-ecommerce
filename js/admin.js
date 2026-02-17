@@ -174,6 +174,8 @@ function showPanel(panelName, options = {}) {
         'returns': 'Returns & Refunds',
         'reports': 'Reports & Analytics',
         'compliance': 'Compliance & Legal',
+        'newsletter': 'Newsletter Management',
+        'emailSettings': 'Email Settings',
         'logs': 'Security & Logs'
     };
     document.getElementById('pageTitle').textContent = titles[panelName] || 'Dashboard';
@@ -223,6 +225,8 @@ function loadPanelData(panelName) {
         'returns': ReturnsPanel,
         'reports': ReportsPanel,
         'compliance': CompliancePanel,
+        'newsletter': NewsletterPanel,
+        'emailSettings': EmailSettingsPanel,
         'logs': SecurityLogsPanel
     };
     

@@ -59,6 +59,14 @@
                 <i class="fas fa-file-alt"></i>
                 <span>Compliance & Legal</span>
             </a>
+            <a href="#newsletter" class="nav-item" data-panel="newsletter">
+                <i class="fas fa-envelope"></i>
+                <span>Newsletter</span>
+            </a>
+            <a href="#emailSettings" class="nav-item" data-panel="emailSettings">
+                <i class="fas fa-cog"></i>
+                <span>Email Settings</span>
+            </a>
             <a href="#logs" class="nav-item" data-panel="logs">
                 <i class="fas fa-shield-alt"></i>
                 <span>Security & Logs</span>
@@ -613,6 +621,150 @@
                 </div>
             </div>
             
+            <!-- Newsletter Panel -->
+            <div id="newsletterPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Newsletter Management</h2>
+                    <div class="panel-actions">
+                        <input type="text" placeholder="Search by email..." id="newsletterSearch" class="search-input">
+                        <select id="newsletterStatusFilter" class="filter-select">
+                            <option value="">All Subscribers</option>
+                            <option value="verified">Verified</option>
+                            <option value="unverified">Unverified</option>
+                        </select>
+                        <button class="btn btn-success" onclick="exportNewsletterCSV()">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="exportNewsletterMailchimp()">
+                            <i class="fas fa-paper-plane"></i> Export Mailchimp
+                        </button>
+                        <button class="btn btn-primary" onclick="NewsletterPanel.load()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Newsletter Statistics -->
+                <div id="newsletterStats" class="stats-grid">
+                    <div class="newsletter-stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>0</h3>
+                            <p>Total Subscribers</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="subscribersTable">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                                <th>Subscribed Date</th>
+                                <th>Last Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribersTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center">Loading subscribers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Email Settings Panel -->
+            <div id="emailSettingsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Email Notification Settings</h2>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3>Order Notifications</h3>
+                        <div class="setting-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="orderConfirmationEnabled" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Send order confirmation emails to customers</span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="newOrderNotificationsEnabled" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Notify admin of new orders</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Inventory Alerts</h3>
+                        <div class="setting-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="lowStockAlertsEnabled" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Enable low stock email alerts</span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>Low Stock Threshold:</label>
+                            <input type="number" id="lowStockThreshold" class="form-input" value="5" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Other Notifications</h3>
+                        <div class="setting-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="returnNotificationsEnabled" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Notify admin of return requests</span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="reviewNotificationsEnabled" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Notify admin of new reviews</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Admin Email Addresses</h3>
+                        <div class="setting-item">
+                            <label>Email Addresses (comma-separated):</label>
+                            <input type="text" id="adminEmails" class="form-input" placeholder="admin@example.com, manager@example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Test Email</h3>
+                        <div class="setting-item">
+                            <label>Send Test Email To:</label>
+                            <div class="test-email-group">
+                                <input type="email" id="testEmailAddress" class="form-input" placeholder="test@example.com">
+                                <button class="btn btn-primary" id="testEmailBtn">
+                                    <i class="fas fa-paper-plane"></i> Send Test
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-success btn-lg" id="saveEmailSettingsBtn">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Security & Logs Panel -->
             <div id="logsPanel" class="panel">
                 <h2>Security & Activity Logs</h2>
@@ -727,6 +879,8 @@
     <script src="js/panels/returns.js"></script>
     <script src="js/panels/reports.js"></script>
     <script src="js/panels/compliance.js"></script>
+    <script src="js/panels/newsletter.js"></script>
+    <script src="js/panels/emailSettings.js"></script>
     <script src="js/panels/securityLogs.js"></script>
     
     <!-- Main Dashboard Script -->

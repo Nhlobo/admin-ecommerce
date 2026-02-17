@@ -1650,3 +1650,133 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Newsletter Panel Styles */
+.newsletter-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Email Settings Panel Styles */
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.settings-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.3em;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.setting-item {
+    margin-bottom: 20px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Toggle Switch Styles */
+.toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background-color: #ccc;
+    border-radius: 26px;
+    transition: background-color 0.3s;
+    margin-right: 12px;
+}
+
+.toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: white;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #28a745;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-text {
+    flex: 1;
+    color: #333;
+}
+
+.test-email-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.test-email-group input {
+    flex: 1;
+}
+
+.settings-actions {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.btn-lg {
+    padding: 15px 40px;
+    font-size: 1.1em;
+}
+
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 10px;
+    }
+    
+    .settings-section {
+        padding: 20px;
+    }
+    
+    .test-email-group {
+        flex-direction: column;
+    }
+    
+    .test-email-group input,
+    .test-email-group button {
+        width: 100%;
+    }
+}
