@@ -801,7 +801,22 @@
             
             <!-- Security & Logs Panel -->
             <div id="logsPanel" class="panel">
-                <h2>Security & Activity Logs</h2>
+                <div class="panel-header">
+                    <h2>Security & Activity Logs</h2>
+                </div>
+                
+                <!-- Security Summary Statistics -->
+                <div id="securitySummaryStats" class="stats-grid">
+                    <div class="security-stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>0</h3>
+                            <p>Failed Login Attempts (24h)</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="activity">Activity Logs</button>
@@ -816,6 +831,9 @@
                             <option value="warning">Warning</option>
                             <option value="critical">Critical</option>
                         </select>
+                        <button class="btn btn-success" onclick="exportActivityLogs()">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
                         <button class="btn btn-primary" onclick="refreshActivityLogs()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
@@ -851,6 +869,9 @@
                             <option value="high">High</option>
                             <option value="critical">Critical</option>
                         </select>
+                        <button class="btn btn-success" onclick="exportSecurityEvents()">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
                         <button class="btn btn-primary" onclick="refreshSecurityEvents()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
@@ -866,11 +887,12 @@
                                     <th>IP Address</th>
                                     <th>Resolved</th>
                                     <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="securityEventsBody">
                                 <tr>
-                                    <td colspan="6" class="text-center">Loading events...</td>
+                                    <td colspan="7" class="text-center">Loading events...</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -1828,3 +1828,52 @@ body {
         height: 250px;
     }
 }
+
+/* Security Panel Styles */
+.security-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.security-stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.security-stat-card .stat-icon.orange {
+    background-color: #ff9800;
+    color: white;
+}
+
+.security-stat-card .stat-icon.red {
+    background-color: #f44336;
+    color: white;
+}
+
+.security-stat-card .stat-icon.blue {
+    background-color: #2196f3;
+    color: white;
+}
+
+.security-stat-card .stat-icon.green {
+    background-color: #4caf50;
+    color: white;
+}
+
+.security-stat-card .stat-info h3 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+.security-stat-card .stat-info p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 0.9em;
+}
