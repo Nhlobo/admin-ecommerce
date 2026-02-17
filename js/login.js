@@ -100,6 +100,13 @@ function validateEmail(email) {
 /**
  * Validate password strength
  * Requirements: Minimum 8 characters
+ * 
+ * IMPORTANT: This is CLIENT-SIDE validation only.
+ * The backend MUST also enforce the same password requirements:
+ * - Minimum 8 characters
+ * - Consider additional requirements (uppercase, numbers, special chars)
+ * - Rate limiting on login attempts
+ * - Password hashing with bcrypt or similar
  */
 function validatePassword(password) {
     return password.length >= 8;
@@ -354,7 +361,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Get form values
         const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
+        // Note: Password is NOT trimmed as users may intentionally include whitespace
+        const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
         
         // Clear previous errors
