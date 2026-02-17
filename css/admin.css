@@ -156,7 +156,7 @@ body {
 }
 
 .password-input-wrapper input {
-    padding-right: 3rem;
+    padding-right: 2.5rem; /* Space for toggle button (button is ~2rem wide) */
 }
 
 .password-toggle {

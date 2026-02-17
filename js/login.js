@@ -194,7 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Check if already logged in (check both localStorage and sessionStorage)
     const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
-    const rememberMe = localStorage.getItem('rememberMe') === 'true';
     
     if (token) {
         setLoadingState(true, 'Verifying session...');
@@ -210,21 +209,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Token expired, clear it from both storages
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminInfo');
+                localStorage.removeItem('rememberMe');
                 sessionStorage.removeItem('adminToken');
                 sessionStorage.removeItem('adminInfo');
-                if (!rememberMe) {
-                    localStorage.removeItem('rememberMe');
-                }
             }
         } catch (error) {
             // Continue to login
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminInfo');
+            localStorage.removeItem('rememberMe');
             sessionStorage.removeItem('adminToken');
             sessionStorage.removeItem('adminInfo');
-            if (!rememberMe) {
-                localStorage.removeItem('rememberMe');
-            }
         }
     }
     
@@ -237,20 +232,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (passwordToggle && passwordInput) {
         passwordToggle.addEventListener('click', () => {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
             
             // Update icon
             const icon = passwordToggle.querySelector('i');
             if (icon) {
-                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
             }
+            
+            // Update aria-label for screen readers
+            passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+            passwordToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
         });
     }
     
     // Restore remember me checkbox state
     const rememberMeCheckbox = document.getElementById('rememberMe');
-    if (rememberMeCheckbox && rememberMe) {
+    const storedRememberMe = localStorage.getItem('rememberMe');
+    if (rememberMeCheckbox && storedRememberMe === 'true') {
         rememberMeCheckbox.checked = true;
     }
     
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Get form values
         const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
+        const password = document.getElementById('password').value.trim();
         const rememberMe = document.getElementById('rememberMe').checked;
         
         // Clear previous errors
@@ -474,7 +474,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Use sessionStorage for session-only tokens (cleared on tab close)
                 sessionStorage.setItem('adminToken', data.data.token);
                 sessionStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
-                localStorage.setItem('rememberMe', 'false');
+                // Remove rememberMe flag if it exists
+                localStorage.removeItem('rememberMe');
             }
             
             // Show success message briefly
