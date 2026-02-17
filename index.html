@@ -39,6 +39,10 @@
                 <i class="fas fa-box"></i>
                 <span>Products & Inventory</span>
             </a>
+            <a href="#reviews" class="nav-item" data-panel="reviews">
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+            </a>
             <a href="#discounts" class="nav-item" data-panel="discounts">
                 <i class="fas fa-tags"></i>
                 <span>Discounts</span>
@@ -342,6 +346,80 @@
                 </div>
             </div>
             
+            <!-- Reviews Panel -->
+            <div id="reviewsPanel" class="panel">
+                <div class="panel-header">
+                    <h2>Product Reviews Moderation</h2>
+                    <div class="panel-actions">
+                        <input type="text" placeholder="Search reviews..." id="reviewSearch" class="search-input">
+                        <select id="reviewStatusFilter" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="flagged">Flagged</option>
+                        </select>
+                        <select id="reviewRatingFilter" class="filter-select">
+                            <option value="">All Ratings</option>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                        <select id="reviewSortBy" class="filter-select">
+                            <option value="date_desc">Newest First</option>
+                            <option value="date_asc">Oldest First</option>
+                            <option value="rating_desc">Highest Rating</option>
+                            <option value="rating_asc">Lowest Rating</option>
+                            <option value="helpful_desc">Most Helpful</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="ReviewsPanel.load()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bulk-actions-bar">
+                    <div class="bulk-actions-info">
+                        <input type="checkbox" id="selectAllReviews">
+                        <label for="selectAllReviews">Select All</label>
+                        <span class="selected-count">(<span id="selectedReviewsCount">0</span> selected)</span>
+                    </div>
+                    <div class="bulk-actions-buttons">
+                        <button class="btn btn-success btn-sm" id="bulkApproveBtn" disabled>
+                            <i class="fas fa-check"></i> Approve Selected
+                        </button>
+                        <button class="btn btn-danger btn-sm" id="bulkRejectBtn" disabled>
+                            <i class="fas fa-times"></i> Reject Selected
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="reviewsTable">
+                        <thead>
+                            <tr>
+                                <th width="40"></th>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Status</th>
+                                <th>Helpful</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center">Loading reviews...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
             <!-- Discounts Panel -->
             <div id="discountsPanel" class="panel">
                 <div class="panel-header">
@@ -601,6 +679,7 @@
     <script src="js/panels/payments.js"></script>
     <script src="js/panels/customers.js"></script>
     <script src="js/panels/products.js"></script>
+    <script src="js/panels/reviews.js"></script>
     <script src="js/panels/discounts.js"></script>
     <script src="js/panels/returns.js"></script>
     <script src="js/panels/reports.js"></script>
