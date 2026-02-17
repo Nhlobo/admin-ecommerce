@@ -27,14 +27,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const RETRY_RELOAD_DELAY_MS = 5000;
     const ERROR_REDIRECT_DELAY_MS = 2000;
     
-    // Check authentication
-    adminToken = localStorage.getItem('adminToken');
+    // Check authentication (check both localStorage and sessionStorage)
+    adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
     if (!adminToken) {
         window.location.href = '/login';
         return;
     }
     
-    const storedAdminInfo = localStorage.getItem('adminInfo');
+    const storedAdminInfo = localStorage.getItem('adminInfo') || sessionStorage.getItem('adminInfo');
     if (storedAdminInfo) {
         adminInfo = JSON.parse(storedAdminInfo);
         document.getElementById('adminName').textContent = adminInfo.fullName || adminInfo.email;

@@ -173,7 +173,8 @@ async function checkServerHealth() {
                 setLoadingState(false);
                 
                 // Show the login form
-                document.getElementById('loginFormContainer').style.display = 'block';
+                const loginFormContainer = document.getElementById('loginFormContainer');
+                loginFormContainer.classList.remove('login-form-hidden');
                 return true;
             }
         } catch (error) {
@@ -191,10 +192,10 @@ async function checkServerHealth() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Login form container is already hidden via inline style in HTML
+    // Login form container is initially hidden via CSS class
     
-    // Check if already logged in
-    const token = localStorage.getItem('adminToken');
+    // Check if already logged in (check both localStorage and sessionStorage)
+    const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
     const rememberMe = localStorage.getItem('rememberMe') === 'true';
     
     if (token) {
@@ -208,9 +209,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = '/dashboard';
                 return;
             } else {
-                // Token expired, clear it
+                // Token expired, clear it from both storages
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminInfo');
+                sessionStorage.removeItem('adminToken');
+                sessionStorage.removeItem('adminInfo');
                 if (!rememberMe) {
                     localStorage.removeItem('rememberMe');
                 }
@@ -219,6 +222,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Continue to login
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminInfo');
+            sessionStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminInfo');
             if (!rememberMe) {
                 localStorage.removeItem('rememberMe');
             }
@@ -445,22 +450,21 @@ document.addEventListener('DOMContentLoaded', async () => {
              * - Implement Content Security Policy (CSP)
              * - Sanitize all user inputs
              * - Regular security audits
+             * 
+             * Implementation note:
+             * For true session-only behavior when Remember Me is not checked,
+             * use sessionStorage instead of localStorage. This automatically clears
+             * tokens when the browser/tab is closed without requiring cleanup handlers.
              */
-            localStorage.setItem('adminToken', data.data.token);
-            localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
-            localStorage.setItem('rememberMe', rememberMe.toString());
-            
-            // If remember me is not checked, set up session cleanup
-            if (!rememberMe) {
-                // Clear tokens when browser/tab is closed (session storage alternative)
-                window.addEventListener('beforeunload', () => {
-                    if (localStorage.getItem('rememberMe') === 'false') {
-                        // Note: This cleanup is best-effort. For true session-only storage,
-                        // consider using sessionStorage for tokens instead
-                        // localStorage.removeItem('adminToken');
-                        // localStorage.removeItem('adminInfo');
-                    }
-                });
+            if (rememberMe) {
+                localStorage.setItem('adminToken', data.data.token);
+                localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                // Use sessionStorage for session-only tokens (cleared on tab close)
+                sessionStorage.setItem('adminToken', data.data.token);
+                sessionStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+                localStorage.setItem('rememberMe', 'false');
             }
             
             // Show success message briefly

@@ -61,6 +61,10 @@ body {
     gap: 2rem;
 }
 
+.login-form-hidden {
+    display: none;
+}
+
 .login-box {
     background: var(--white);
     padding: 3rem;
@@ -897,12 +901,44 @@ body {
         flex: 1;
     }
     
+    .login-box {
+        padding: 2rem 1.5rem;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .social-login {
+        gap: 0.5rem;
+    }
+    
+    .btn-social {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.75rem;
+    }
+    
     .panel-grid {
         grid-template-columns: 1fr;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .login-header i {
+        font-size: 2rem;
+    }
+    
+    .btn-social i {
+        font-size: 1rem;
     }
 }
 
