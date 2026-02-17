@@ -1,9 +1,116 @@
 /**
  * Admin Login Script
  * Handles authentication for admin dashboard
+ * 
+ * Features:
+ * - Email/Password authentication with JWT tokens
+ * - Remember Me functionality with secure local storage
+ * - Password visibility toggle
+ * - Social login placeholders (Google, Facebook OAuth)
+ * - Rate limiting hints for security
+ * - Comprehensive form validation
+ * - CSRF protection placeholders
  */
 
 const API_BASE = ADMIN_CONFIG.API_BASE_URL;
+
+// Rate limiting configuration (client-side hint)
+// Note: Server-side rate limiting should be implemented in the backend API
+const LOGIN_RATE_LIMIT = {
+    maxAttempts: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    storageKey: 'loginAttempts'
+};
+
+/**
+ * Check and enforce client-side rate limiting
+ * Returns true if login attempt is allowed, false otherwise
+ */
+function checkRateLimit() {
+    const stored = localStorage.getItem(LOGIN_RATE_LIMIT.storageKey);
+    const now = Date.now();
+    
+    if (!stored) {
+        return true;
+    }
+    
+    const { attempts, firstAttempt } = JSON.parse(stored);
+    
+    // Reset if window has passed
+    if (now - firstAttempt > LOGIN_RATE_LIMIT.windowMs) {
+        localStorage.removeItem(LOGIN_RATE_LIMIT.storageKey);
+        return true;
+    }
+    
+    // Check if exceeded
+    if (attempts >= LOGIN_RATE_LIMIT.maxAttempts) {
+        const remainingTime = Math.ceil((LOGIN_RATE_LIMIT.windowMs - (now - firstAttempt)) / 60000);
+        showError(`Too many login attempts. Please try again in ${remainingTime} minutes.`);
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Record a failed login attempt
+ */
+function recordFailedAttempt() {
+    const stored = localStorage.getItem(LOGIN_RATE_LIMIT.storageKey);
+    const now = Date.now();
+    
+    if (!stored) {
+        localStorage.setItem(LOGIN_RATE_LIMIT.storageKey, JSON.stringify({
+            attempts: 1,
+            firstAttempt: now
+        }));
+    } else {
+        const { attempts, firstAttempt } = JSON.parse(stored);
+        
+        // Reset if window has passed
+        if (now - firstAttempt > LOGIN_RATE_LIMIT.windowMs) {
+            localStorage.setItem(LOGIN_RATE_LIMIT.storageKey, JSON.stringify({
+                attempts: 1,
+                firstAttempt: now
+            }));
+        } else {
+            localStorage.setItem(LOGIN_RATE_LIMIT.storageKey, JSON.stringify({
+                attempts: attempts + 1,
+                firstAttempt
+            }));
+        }
+    }
+}
+
+/**
+ * Clear login attempts on successful login
+ */
+function clearLoginAttempts() {
+    localStorage.removeItem(LOGIN_RATE_LIMIT.storageKey);
+}
+
+/**
+ * Validate email format
+ */
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * Validate password strength
+ * Requirements: Minimum 8 characters
+ * 
+ * IMPORTANT: This is CLIENT-SIDE validation only.
+ * The backend MUST also enforce the same password requirements:
+ * - Minimum 8 characters
+ * - Consider additional requirements (uppercase, numbers, special chars)
+ * - Rate limiting on login attempts
+ * - Password hashing with bcrypt or similar
+ */
+function validatePassword(password) {
+    return password.length >= 8;
+}
 
 function setLoadingState(isLoading, message = 'Connecting to secure server...') {
     const overlay = document.getElementById('globalLoadingOverlay');
@@ -21,7 +128,30 @@ function showError(message) {
     const errorMessage = document.getElementById('errorMessage');
     if (errorMessage) {
         errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
+        errorMessage.className = 'error-message';
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+        }, 10000);
+    }
+}
+
+function showSuccess(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+        errorMessage.textContent = message;
+        errorMessage.className = 'success-message';
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+        }, 5000);
+    }
+}
+
+function hideMessage() {
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+        errorMessage.classList.add('hidden');
     }
 }
 
@@ -48,7 +178,8 @@ async function checkServerHealth() {
                 setLoadingState(false);
                 
                 // Show the login form
-                document.getElementById('loginFormContainer').style.display = 'block';
+                const loginFormContainer = document.getElementById('loginFormContainer');
+                loginFormContainer.classList.remove('login-form-hidden');
                 return true;
             }
         } catch (error) {
@@ -66,10 +197,11 @@ async function checkServerHealth() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Login form container is already hidden via inline style in HTML
+    // Login form container is initially hidden via CSS class
     
-    // Check if already logged in
-    const token = localStorage.getItem('adminToken');
+    // Check if already logged in (check both localStorage and sessionStorage)
+    const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+    
     if (token) {
         setLoadingState(true, 'Verifying session...');
         // Verify token is still valid
@@ -81,19 +213,144 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = '/dashboard';
                 return;
             } else {
-                // Token expired, clear it
+                // Token expired, clear it from both storages
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminInfo');
+                localStorage.removeItem('rememberMe');
+                sessionStorage.removeItem('adminToken');
+                sessionStorage.removeItem('adminInfo');
             }
         } catch (error) {
             // Continue to login
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminInfo');
+            localStorage.removeItem('rememberMe');
+            sessionStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminInfo');
         }
     }
     
     // Check server health before showing login
     await checkServerHealth();
+    
+    // Initialize password toggle
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            
+            // Update icon
+            const icon = passwordToggle.querySelector('i');
+            if (icon) {
+                icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            }
+            
+            // Update aria-label for screen readers
+            passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+            passwordToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+        });
+    }
+    
+    // Restore remember me checkbox state
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+    const storedRememberMe = localStorage.getItem('rememberMe');
+    if (rememberMeCheckbox && storedRememberMe === 'true') {
+        rememberMeCheckbox.checked = true;
+    }
+    
+    // Handle forgot password link
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            /**
+             * TODO: Implement forgot password functionality
+             * 
+             * This should typically:
+             * 1. Open a modal for password reset
+             * 2. Or redirect to a password reset page
+             * 3. Send password reset email via backend API
+             * 
+             * Example implementation:
+             * - Show modal with email input
+             * - POST to /api/admin/password-reset with email
+             * - Backend sends reset link via email
+             * - User clicks link to reset password
+             */
+            showError('Password reset functionality is not yet implemented. Please contact your system administrator to reset your password.');
+        });
+    }
+    
+    // Handle social login buttons
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+    
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', async () => {
+            /**
+             * GOOGLE OAUTH INTEGRATION PLACEHOLDER
+             * 
+             * To implement Google login:
+             * 1. Set up Google OAuth 2.0 credentials in Google Cloud Console
+             * 2. Add your OAuth client ID below
+             * 3. Implement backend endpoint to handle Google OAuth callback
+             * 4. Exchange authorization code for user info and create/login user
+             * 
+             * Example implementation:
+             * - Use Google Sign-In JavaScript Library or OAuth 2.0 flow
+             * - Redirect to: https://accounts.google.com/o/oauth2/v2/auth
+             * - Handle callback with authorization code
+             * - Backend validates code and creates/returns JWT token
+             */
+            
+            // Placeholder implementation
+            showError('Google login is not yet configured. Please contact your administrator or use email/password login.');
+            
+            // Uncomment and implement when ready:
+            // const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+            // const redirectUri = `${window.location.origin}/auth/google/callback`;
+            // const scope = 'email profile';
+            // const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+            // window.location.href = authUrl;
+        });
+    }
+    
+    if (facebookLoginBtn) {
+        facebookLoginBtn.addEventListener('click', async () => {
+            /**
+             * FACEBOOK OAUTH INTEGRATION PLACEHOLDER
+             * 
+             * To implement Facebook login:
+             * 1. Create a Facebook App in Facebook Developers Console
+             * 2. Add your App ID below
+             * 3. Implement backend endpoint to handle Facebook OAuth callback
+             * 4. Exchange authorization code for user info and create/login user
+             * 
+             * Example implementation:
+             * - Use Facebook JavaScript SDK or OAuth 2.0 flow
+             * - Initialize FB SDK with your App ID
+             * - Use FB.login() to get access token
+             * - Backend validates token and creates/returns JWT token
+             */
+            
+            // Placeholder implementation
+            showError('Facebook login is not yet configured. Please contact your administrator or use email/password login.');
+            
+            // Uncomment and implement when ready:
+            // const FACEBOOK_APP_ID = 'YOUR_FACEBOOK_APP_ID';
+            // FB.init({ appId: FACEBOOK_APP_ID, version: 'v12.0' });
+            // FB.login(function(response) {
+            //     if (response.authResponse) {
+            //         // Send access token to backend
+            //         const accessToken = response.authResponse.accessToken;
+            //         // fetch(`${API_BASE}/api/admin/auth/facebook`, { method: 'POST', body: JSON.stringify({ accessToken }) })
+            //     }
+            // }, {scope: 'public_profile,email'});
+        });
+    }
     
     // Handle login form
     const loginForm = document.getElementById('loginForm');
@@ -102,24 +359,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const email = document.getElementById('email').value;
+        // Get form values
+        const email = document.getElementById('email').value.trim();
+        // Note: Password is NOT trimmed as users may intentionally include whitespace
         const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
         
         // Clear previous errors
-        errorMessage.style.display = 'none';
-        errorMessage.textContent = '';
+        hideMessage();
+        
+        // Client-side validation
+        if (!validateEmail(email)) {
+            showError('Please enter a valid email address.');
+            document.getElementById('email').focus();
+            return;
+        }
+        
+        if (!validatePassword(password)) {
+            showError('Password must be at least 8 characters long.');
+            document.getElementById('password').focus();
+            return;
+        }
+        
+        // Check rate limiting
+        if (!checkRateLimit()) {
+            return;
+        }
         
         // Disable submit button
         const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalBtnContent = submitBtn.innerHTML;
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
         setLoadingState(true, 'Signing in...');
         
         try {
+            /**
+             * CSRF PROTECTION NOTE:
+             * In production, implement CSRF token validation:
+             * 1. Backend should generate a CSRF token on page load
+             * 2. Include token in a meta tag or cookie
+             * 3. Add token to all POST requests in a header (e.g., X-CSRF-Token)
+             * 4. Backend validates token on each request
+             * 
+             * Example:
+             * const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+             * headers: { 'X-CSRF-Token': csrfToken }
+             */
+            
             const response = await fetchWithRetry(`${API_BASE}${getAdminApiEndpoint('/admin/login')}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    // 'X-CSRF-Token': csrfToken  // Uncomment when CSRF is implemented
                 },
                 body: JSON.stringify({ email, password })
             }, {
@@ -131,9 +423,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json().catch(() => ({}));
             
             if (!response.ok) {
+                // Record failed attempt
+                recordFailedAttempt();
+                
                 // Specific error messages based on status code
                 if (response.status === 401) {
                     throw new Error('Invalid email or password. Please check your credentials.');
+                } else if (response.status === 429) {
+                    throw new Error('Too many login attempts. Please try again later.');
                 } else if (response.status === 503) {
                     throw new Error('Server is temporarily unavailable. Please wait a moment and try again.');
                 } else if (response.status === 500) {
@@ -148,11 +445,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error('Invalid response from server. Please try again or contact support.');
             }
             
+            // Clear failed login attempts
+            clearLoginAttempts();
+            
             // Store token and admin info
-            localStorage.setItem('adminToken', data.data.token);
-            localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+            /**
+             * SECURITY NOTE - Remember Me Implementation:
+             * 
+             * Current implementation: Token stored in localStorage
+             * 
+             * Security considerations:
+             * 1. localStorage persists across sessions - use only on trusted devices
+             * 2. Tokens are accessible to JavaScript - protect against XSS
+             * 3. For enhanced security, consider:
+             *    - Shorter token expiration times (enforced by backend)
+             *    - Refresh tokens stored in httpOnly cookies
+             *    - Device fingerprinting for additional validation
+             *    - IP address validation (backend)
+             * 
+             * Best practices:
+             * - Always use HTTPS in production
+             * - Implement Content Security Policy (CSP)
+             * - Sanitize all user inputs
+             * - Regular security audits
+             * 
+             * Implementation note:
+             * For true session-only behavior when Remember Me is not checked,
+             * use sessionStorage instead of localStorage. This automatically clears
+             * tokens when the browser/tab is closed without requiring cleanup handlers.
+             */
+            if (rememberMe) {
+                localStorage.setItem('adminToken', data.data.token);
+                localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                // Use sessionStorage for session-only tokens (cleared on tab close)
+                sessionStorage.setItem('adminToken', data.data.token);
+                sessionStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+                // Remove rememberMe flag if it exists
+                localStorage.removeItem('rememberMe');
+            }
             
             // Show success message briefly
+            showSuccess('Login successful! Redirecting to dashboard...');
             setLoadingState(true, 'Login successful! Redirecting...');
             await new Promise(resolve => setTimeout(resolve, 800));
             
@@ -171,12 +506,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 errorMsg = error.message || 'Unable to connect to server. Please try again.';
             }
             
-            errorMessage.textContent = errorMsg;
-            errorMessage.style.display = 'block';
+            showError(errorMsg);
             
             // Re-enable submit button
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            submitBtn.innerHTML = originalBtnContent;
         } finally {
             setLoadingState(false);
         }
