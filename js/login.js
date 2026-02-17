@@ -122,10 +122,9 @@ function showError(message) {
     if (errorMessage) {
         errorMessage.textContent = message;
         errorMessage.className = 'error-message';
-        errorMessage.style.display = 'block';
         // Auto-hide after 10 seconds
         setTimeout(() => {
-            errorMessage.style.display = 'none';
+            errorMessage.classList.add('hidden');
         }, 10000);
     }
 }
@@ -135,10 +134,9 @@ function showSuccess(message) {
     if (errorMessage) {
         errorMessage.textContent = message;
         errorMessage.className = 'success-message';
-        errorMessage.style.display = 'block';
         // Auto-hide after 5 seconds
         setTimeout(() => {
-            errorMessage.style.display = 'none';
+            errorMessage.classList.add('hidden');
         }, 5000);
     }
 }
@@ -146,7 +144,7 @@ function showSuccess(message) {
 function hideMessage() {
     const errorMessage = document.getElementById('errorMessage');
     if (errorMessage) {
-        errorMessage.style.display = 'none';
+        errorMessage.classList.add('hidden');
     }
 }
 
@@ -261,9 +259,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (forgotPasswordLink) {
         forgotPasswordLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // TODO: Implement forgot password functionality
-            // This should typically open a modal or redirect to a password reset page
-            alert('Password reset functionality will be implemented by your backend team.\n\nPlease contact your system administrator to reset your password.');
+            /**
+             * TODO: Implement forgot password functionality
+             * 
+             * This should typically:
+             * 1. Open a modal for password reset
+             * 2. Or redirect to a password reset page
+             * 3. Send password reset email via backend API
+             * 
+             * Example implementation:
+             * - Show modal with email input
+             * - POST to /api/admin/password-reset with email
+             * - Backend sends reset link via email
+             * - User clicks link to reset password
+             */
+            showError('Password reset functionality is not yet implemented. Please contact your system administrator to reset your password.');
         });
     }
     
