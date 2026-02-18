@@ -364,5 +364,19 @@ The admin dashboard is production-ready with:
 
 ## Screenshots
 
-Login page: https://github.com/user-attachments/assets/aa1d1f39-0750-415d-a00f-94d913a3f13c
+### Login Page
+Professional admin login interface with email/password authentication, "Remember Me" functionality, and security features display.
+
+![Login Page](https://github.com/user-attachments/assets/aa1d1f39-0750-415d-a00f-94d913a3f13c)
+
+### Dashboard Features
+The admin dashboard includes:
+- **Responsive sidebar** with 13 management panels
+- **Overview panel** with real-time statistics and Chart.js analytics
+- **Order management** with detailed order modals, status updates, and print capabilities
+- **Product inventory** with variants, stock tracking, and low-stock alerts
+- **Role-based access** control with permission checking
+- **Mobile-friendly** design with collapsible navigation
+
+Note: Additional screenshots of individual panels can be captured after backend integration for live data display.
 
