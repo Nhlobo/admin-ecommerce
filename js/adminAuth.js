@@ -67,25 +67,48 @@ const AdminAuth = {
             return true;
         }
         
-        // Staff permissions
-        const staffPermissions = [
-            'view_orders',
-            'update_orders',
-            'view_products',
-            'update_products',
-            'update_inventory',
-            'view_customers',
-            'view_payments',
-            'process_returns',
-            'view_returns',
-            'view_discounts'
-        ];
+        // Define role-based permissions
+        const permissions = {
+            super_admin: ['*'], // All permissions
+            staff: [
+                'view_orders',
+                'update_orders',
+                'view_products',
+                'update_products',
+                'update_inventory',
+                'view_customers',
+                'view_payments',
+                'process_returns',
+                'view_returns',
+                'view_discounts',
+                'approve_reviews',
+                'view_reviews',
+                'view_reports',
+                'export_data',
+                'import_products',
+                'view_newsletter',
+                'view_analytics',
+                'update_email_settings'
+            ],
+            moderator: [
+                'view_reviews',
+                'approve_reviews',
+                'reject_reviews',
+                'flag_reviews',
+                'view_customers',
+                'view_orders'
+            ]
+        };
         
-        if (this.isStaff()) {
-            return staffPermissions.includes(permission);
+        const role = this.getRole();
+        const rolePermissions = permissions[role] || [];
+        
+        // Check if role has wildcard permission
+        if (rolePermissions.includes('*')) {
+            return true;
         }
         
-        return false;
+        return rolePermissions.includes(permission);
     },
     
     /**

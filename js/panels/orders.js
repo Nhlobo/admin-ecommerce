@@ -246,7 +246,10 @@ const OrdersPanel = {
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                    <button class="btn btn-primary" onclick="OrdersPanel.printInvoice('${order.id}')">
+                    <button class="btn btn-info" onclick="OrdersPanel.printPackingSlip('${order.id}'); this.closest('.modal').remove()">
+                        <i class="fas fa-box"></i> Print Packing Slip
+                    </button>
+                    <button class="btn btn-primary" onclick="OrdersPanel.printInvoice('${order.id}'); this.closest('.modal').remove()">
                         <i class="fas fa-print"></i> Print Invoice
                     </button>
                 </div>
@@ -296,9 +299,237 @@ const OrdersPanel = {
     /**
      * Print invoice
      */
-    printInvoice(orderId) {
-        Notifications.info('Invoice printing will be implemented with backend support');
-        // TODO: Implement invoice generation and printing
+    async printInvoice(orderId) {
+        try {
+            const data = await API.get(`/admin/orders/${orderId}`);
+            
+            if (data.success && data.data) {
+                this.generatePrintableInvoice(data.data);
+            } else {
+                Notifications.error('Failed to load order data');
+            }
+        } catch (error) {
+            console.error('Error loading order for invoice:', error);
+            Notifications.error('Failed to generate invoice');
+        }
+    },
+    
+    /**
+     * Generate printable invoice
+     */
+    generatePrintableInvoice(order) {
+        const itemsHtml = (order.items || []).map(item => `
+            <tr>
+                <td>${Utils.escapeHtml(item.product_name)}</td>
+                <td>${item.quantity}</td>
+                <td>${Utils.formatCurrency(item.price)}</td>
+                <td>${Utils.formatCurrency(item.quantity * item.price)}</td>
+            </tr>
+        `).join('');
+        
+        const invoiceWindow = window.open('', '_blank');
+        invoiceWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Invoice - ${order.order_number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .invoice-header { text-align: center; margin-bottom: 30px; }
+                    .invoice-details { margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                    th { background-color: #f8f9fa; }
+                    .total { font-weight: bold; font-size: 1.2em; }
+                    @media print {
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="invoice-header">
+                    <h1>INVOICE</h1>
+                    <p>Order #: ${Utils.escapeHtml(order.order_number)}</p>
+                    <p>Date: ${Utils.formatDate(order.placed_at)}</p>
+                </div>
+                
+                <div class="invoice-details">
+                    <h3>Customer Information</h3>
+                    <p><strong>Name:</strong> ${Utils.escapeHtml(order.customer_name)}</p>
+                    <p><strong>Email:</strong> ${Utils.escapeHtml(order.customer_email)}</p>
+                    <p><strong>Shipping Address:</strong> ${Utils.escapeHtml(order.shipping_address || 'N/A')}</p>
+                </div>
+                
+                <h3>Order Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total">
+                            <td colspan="3">Total Amount:</td>
+                            <td>${Utils.formatCurrency(order.total_amount)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <div style="margin-top: 40px; text-align: center;" class="no-print">
+                    <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+                        Print Invoice
+                    </button>
+                    <button onclick="window.close()" style="padding: 10px 20px; font-size: 16px; cursor: pointer; margin-left: 10px;">
+                        Close
+                    </button>
+                </div>
+            </body>
+            </html>
+        `);
+        invoiceWindow.document.close();
+    },
+    
+    /**
+     * Print packing slip
+     */
+    async printPackingSlip(orderId) {
+        try {
+            const data = await API.get(`/admin/orders/${orderId}`);
+            
+            if (data.success && data.data) {
+                this.generatePrintablePackingSlip(data.data);
+            } else {
+                Notifications.error('Failed to load order data');
+            }
+        } catch (error) {
+            console.error('Error loading order for packing slip:', error);
+            Notifications.error('Failed to generate packing slip');
+        }
+    },
+    
+    /**
+     * Generate printable packing slip
+     */
+    generatePrintablePackingSlip(order) {
+        const itemsHtml = (order.items || []).map(item => `
+            <tr>
+                <td>${Utils.escapeHtml(item.product_name)}</td>
+                <td>${item.quantity}</td>
+                <td>☐</td>
+            </tr>
+        `).join('');
+        
+        const packingSlipWindow = window.open('', '_blank');
+        packingSlipWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Packing Slip - ${order.order_number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .details { margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                    th { background-color: #f8f9fa; }
+                    @media print {
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>PACKING SLIP</h1>
+                    <p>Order #: ${Utils.escapeHtml(order.order_number)}</p>
+                    <p>Date: ${Utils.formatDate(order.placed_at)}</p>
+                </div>
+                
+                <div class="details">
+                    <h3>Ship To:</h3>
+                    <p><strong>${Utils.escapeHtml(order.customer_name)}</strong></p>
+                    <p>${Utils.escapeHtml(order.shipping_address || 'N/A')}</p>
+                </div>
+                
+                <h3>Items to Pack</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Packed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 40px;">
+                    <p><strong>Notes:</strong></p>
+                    <div style="border: 1px solid #ddd; padding: 10px; min-height: 100px;"></div>
+                </div>
+                
+                <div style="margin-top: 40px; text-align: center;" class="no-print">
+                    <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+                        Print Packing Slip
+                    </button>
+                    <button onclick="window.close()" style="padding: 10px 20px; font-size: 16px; cursor: pointer; margin-left: 10px;">
+                        Close
+                    </button>
+                </div>
+            </body>
+            </html>
+        `);
+        packingSlipWindow.document.close();
+    },
+    
+    /**
+     * Export orders to CSV
+     */
+    async exportOrders() {
+        try {
+            Notifications.info('Generating CSV export...');
+            
+            const params = {
+                ...this.currentFilters,
+                format: 'csv'
+            };
+            
+            const response = await fetch(
+                getApiUrl(ADMIN_CONFIG.ENDPOINTS.exportOrders) + '?' + new URLSearchParams(params),
+                {
+                    headers: {
+                        'Authorization': `Bearer ${AdminAuth.getToken()}`
+                    }
+                }
+            );
+            
+            if (!response.ok) {
+                throw new Error('Failed to export orders');
+            }
+            
+            // Download the file
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            Notifications.success('Orders exported successfully');
+        } catch (error) {
+            console.error('Error exporting orders:', error);
+            Notifications.error('Failed to export orders');
+        }
     },
     
     /**
@@ -310,8 +541,9 @@ const OrdersPanel = {
     }
 };
 
-// Make refresh function available globally
+// Make functions available globally
 window.refreshOrders = () => OrdersPanel.refresh();
+window.exportOrders = () => OrdersPanel.exportOrders();
 
 // Export
 if (typeof window !== 'undefined') {

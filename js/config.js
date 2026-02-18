@@ -62,7 +62,42 @@ const ADMIN_CONFIG = {
         
         // Security
         securityEvents: '/api/admin/security/events',
-        securityLogs: '/api/admin/security/logs'
+        securityLogs: '/api/admin/security/logs',
+        
+        // Reviews
+        adminReviews: '/api/admin/reviews',
+        approveReview: (id) => `/api/admin/reviews/${id}/approve`,
+        rejectReview: (id) => `/api/admin/reviews/${id}/reject`,
+        flagReview: (id) => `/api/admin/reviews/${id}/flag`,
+        
+        // Bulk operations
+        exportProducts: '/api/admin/products/export',
+        importProducts: '/api/admin/products/import',
+        exportOrders: '/api/admin/orders/export',
+        exportSubscribers: '/api/admin/newsletter/export',
+        bulkUpdateStock: '/api/admin/products/bulk-stock',
+        
+        // Analytics
+        revenueChart: '/api/admin/analytics/revenue',
+        topProducts: '/api/admin/analytics/top-products',
+        salesByCategory: '/api/admin/analytics/sales-by-category',
+        customerMetrics: '/api/admin/analytics/customer-metrics',
+        
+        // Newsletter
+        newsletterSubscribers: '/api/admin/newsletter/subscribers',
+        unsubscribeUser: (id) => `/api/admin/newsletter/${id}/unsubscribe`,
+        
+        // VAT & Compliance
+        vatReport: '/api/admin/compliance/vat-report',
+        
+        // Email Settings
+        emailSettings: '/api/admin/settings/email',
+        testEmail: '/api/admin/settings/email/test',
+        
+        // Inventory
+        stockHistory: '/api/admin/inventory/stock-history',
+        stockAdjustment: '/api/admin/inventory/adjust',
+        reorderAlerts: '/api/admin/inventory/reorder-alerts'
     },
     
     // Application Settings

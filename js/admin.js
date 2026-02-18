@@ -169,10 +169,13 @@ function showPanel(panelName, options = {}) {
         'payments': 'Payments Management',
         'customers': 'Customers Management',
         'products': 'Products & Inventory',
+        'reviews': 'Product Reviews',
         'discounts': 'Discounts & Promotions',
         'returns': 'Returns & Refunds',
         'reports': 'Reports & Analytics',
         'compliance': 'Compliance & Legal',
+        'newsletter': 'Newsletter Management',
+        'emailSettings': 'Email Settings',
         'logs': 'Security & Logs'
     };
     document.getElementById('pageTitle').textContent = titles[panelName] || 'Dashboard';
@@ -217,10 +220,13 @@ function loadPanelData(panelName) {
         'payments': PaymentsPanel,
         'customers': CustomersPanel,
         'products': ProductsPanel,
+        'reviews': ReviewsPanel,
         'discounts': DiscountsPanel,
         'returns': ReturnsPanel,
         'reports': ReportsPanel,
         'compliance': CompliancePanel,
+        'newsletter': NewsletterPanel,
+        'emailSettings': EmailSettingsPanel,
         'logs': SecurityLogsPanel
     };
     
