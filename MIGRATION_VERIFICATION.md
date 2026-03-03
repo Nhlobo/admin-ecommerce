@@ -184,7 +184,7 @@ CORS is properly configured for standalone deployment:
 The following items require user configuration before deployment:
 
 1. **Backend API URL** (js/config.js, line 15):
-   - Current: `https://backend-ecommerce-3-2jsk.onrender.com`
+   - Current: `https://backend-ecommerce-5-42p4.onrender.com`
    - Action: Update to match actual backend deployment URL
    - Note: This URL appears to be a valid Render URL, may be correct
 
