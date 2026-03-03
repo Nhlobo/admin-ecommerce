@@ -118,7 +118,7 @@ The admin dashboard needs to connect to the backend API. The API URL is configur
 const ADMIN_CONFIG = {
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-3-2jsk.onrender.com',  // Production
+        : 'https://backend-ecommerce-5-42p4.onrender.com',  // Production
     // ... other config
 };
 ```
@@ -126,7 +126,7 @@ const ADMIN_CONFIG = {
 **To update the backend URL:**
 1. Edit `js/config.js`
 2. Update the production URL in the `API_BASE_URL` field
-3. Replace `https://backend-ecommerce-3-2jsk.onrender.com` with your actual backend deployment URL
+3. Replace `https://backend-ecommerce-5-42p4.onrender.com` with your actual backend deployment URL
 
 ### Environment Variables
 

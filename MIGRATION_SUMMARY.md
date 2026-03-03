@@ -26,7 +26,7 @@ All files from the `admin-ecommerce/` directory of the monorepo have been migrat
 #### API Configuration (js/config.js)
 - Automatic environment detection (localhost vs production)
 - Clear documentation on where to update production URL
-- Current production URL: `https://backend-ecommerce-3-2jsk.onrender.com`
+- Current production URL: `https://backend-ecommerce-5-42p4.onrender.com`
 - ⚠️ **Action Required**: Verify this URL is correct for your backend
 
 #### Package.json
@@ -140,7 +140,7 @@ Before deploying to production:
 
 1. **Update Backend API URL** (if needed):
    - Edit `js/config.js`, line 15
-   - Replace `https://backend-ecommerce-3-2jsk.onrender.com` with your backend URL
+   - Replace `https://backend-ecommerce-5-42p4.onrender.com` with your backend URL
 
 2. **Update Backend CORS**:
    - Add your admin dashboard URL to backend CORS_ORIGINS

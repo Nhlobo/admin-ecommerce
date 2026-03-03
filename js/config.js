@@ -3,7 +3,7 @@
  * Configure the backend API URL here
  * 
  * IMPORTANT: Update the production API URL before deployment!
- * Replace 'https://backend-ecommerce-3-2jsk.onrender.com' with your actual backend URL
+ * Replace 'https://backend-ecommerce-5-42p4.onrender.com' with your actual backend URL
  */
 
 // Backend API Configuration
@@ -15,7 +15,7 @@ const ADMIN_CONFIG = {
     // ⚠️ CONFIGURATION REQUIRED: Update this URL to your deployed backend
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-3-2jsk.onrender.com',  // Production - UPDATE THIS!
+        : 'https://backend-ecommerce-5-42p4.onrender.com',  // Production - UPDATE THIS!
     
     // API Endpoints
     ENDPOINTS: {
