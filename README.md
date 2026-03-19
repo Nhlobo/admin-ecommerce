@@ -123,7 +123,7 @@ const ADMIN_CONFIG = {
 
 **Default backend URL behavior:**
 - Local admin (`localhost`) → `http://localhost:5000`
-- Production → `https://backend-ecommerce.onrender.com`
+- Production → `https://backend-ecommerce-1-xp4b.onrender.com`
 
 **Override backend URL:**
 1. Runtime injection: `window.__ADMIN_CONFIG__ = { API_BASE_URL: 'https://your-backend-url' }`
@@ -169,7 +169,7 @@ This repository is configured for easy deployment to Render using `render.yaml`:
 
 The admin dashboard connects to the backend API at:
 - **Development**: `http://localhost:5000`
-- **Production**: `https://backend-ecommerce.onrender.com` (or your custom override)
+- **Production**: `https://backend-ecommerce-1-xp4b.onrender.com` (or your custom override)
 
 Configuration is automatic via `js/config.js` which detects the environment based on hostname.
 

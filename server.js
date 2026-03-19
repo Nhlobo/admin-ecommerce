@@ -22,7 +22,7 @@ if (missingEnvVars.length > 0) {
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const TRUST_PROXY = process.env.TRUST_PROXY === 'true';
-const BACKEND_API_URL = process.env.BACKEND_API_URL || 'https://backend-ecommerce.onrender.com';
+const BACKEND_API_URL = process.env.BACKEND_API_URL || 'https://backend-ecommerce-1-xp4b.onrender.com';
 const FRONTEND_APP_URL = process.env.FRONTEND_APP_URL || 'https://frontend-ecommerce.onrender.com';
 const LOCAL_DEV_ORIGINS = [
     'http://localhost:3000',

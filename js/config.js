@@ -8,7 +8,7 @@
  */
 
 const DEFAULT_DEV_API_BASE_URL = 'http://localhost:5000';
-const DEFAULT_PROD_API_BASE_URL = 'https://backend-ecommerce.onrender.com';
+const DEFAULT_PROD_API_BASE_URL = 'https://backend-ecommerce-1-xp4b.onrender.com';
 
 function normalizeBaseUrl(url) {
     if (!url || typeof url !== 'string') return '';

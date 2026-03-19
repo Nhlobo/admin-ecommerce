@@ -8,7 +8,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: BACKEND_API_URL
-        value: https://backend-ecommerce.onrender.com
+        value: https://backend-ecommerce-1-xp4b.onrender.com
       - key: FRONTEND_APP_URL
         value: https://frontend-ecommerce.onrender.com
       - key: TRUST_PROXY
