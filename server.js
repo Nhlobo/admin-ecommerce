@@ -22,6 +22,18 @@ if (missingEnvVars.length > 0) {
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const TRUST_PROXY = process.env.TRUST_PROXY === 'true';
+const BACKEND_API_URL = process.env.BACKEND_API_URL || 'https://backend-ecommerce.onrender.com';
+const FRONTEND_APP_URL = process.env.FRONTEND_APP_URL || 'https://frontend-ecommerce.onrender.com';
+const LOCAL_DEV_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:5000',
+    'http://127.0.0.1:5000'
+];
 
 // ============================================
 // Trust Proxy Configuration
@@ -41,7 +53,7 @@ app.use(helmet({
             scriptSrc: ["'self'", "'unsafe-inline'"],
             fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "http://localhost:3000", "https://*.onrender.com"]
+            connectSrc: [...new Set(["'self'", ...LOCAL_DEV_ORIGINS, BACKEND_API_URL, FRONTEND_APP_URL, 'https://*.onrender.com'])]
         }
     },
     crossOriginEmbedderPolicy: false
@@ -57,7 +69,7 @@ const corsOptions = {
         
         const allowedOrigins = process.env.CORS_ORIGINS 
             ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
-            : [`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`];
+            : [...new Set([`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`, BACKEND_API_URL, FRONTEND_APP_URL, ...LOCAL_DEV_ORIGINS])];
         
         if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
             callback(null, true);

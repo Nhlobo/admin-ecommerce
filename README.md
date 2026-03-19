@@ -7,8 +7,8 @@ This is the secure admin dashboard for managing the Premium Hair Wigs & Extensio
 ✅ **Migration Complete** - All files have been migrated from the `admin-ecommerce/` directory of the monorepo to this standalone repository.
 
 ### Related Repositories
-- **Backend API**: [Nhlobo/ecommerce-backend](https://github.com/Nhlobo/ecommerce-backend) (if exists)
-- **Customer Frontend**: [Nhlobo/ecommerce-frontend](https://github.com/Nhlobo/ecommerce-frontend) (if exists)
+- **Backend API**: [Nhlobo/backend-ecommerce](https://github.com/Nhlobo/backend-ecommerce)
+- **Customer Frontend**: [Nhlobo/frontend-ecommerce](https://github.com/Nhlobo/frontend-ecommerce)
 - **Original Monorepo**: [Nhlobo/ecommerce](https://github.com/Nhlobo/ecommerce) (reference only)
 
 ## 🏗️ Architecture
@@ -116,17 +116,18 @@ The admin dashboard needs to connect to the backend API. The API URL is configur
 
 ```javascript
 const ADMIN_CONFIG = {
-    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-5-42p4.onrender.com',  // Production
+    API_BASE_URL: resolveApiBaseUrl(),
     // ... other config
 };
 ```
 
-**To update the backend URL:**
-1. Edit `js/config.js`
-2. Update the production URL in the `API_BASE_URL` field
-3. Replace `https://backend-ecommerce-5-42p4.onrender.com` with your actual backend deployment URL
+**Default backend URL behavior:**
+- Local admin (`localhost`) → `http://localhost:5000`
+- Production → `https://backend-ecommerce.onrender.com`
+
+**Override backend URL:**
+1. Runtime injection: `window.__ADMIN_CONFIG__ = { API_BASE_URL: 'https://your-backend-url' }`
+2. Local browser override: `localStorage.setItem('adminApiBaseUrl', 'https://your-backend-url')`
 
 ### Environment Variables
 
@@ -140,6 +141,8 @@ Configure the following variables:
 
 - `NODE_ENV` - Set to `production` for production deployment
 - `PORT` - Server port (default: 3000)
+- `BACKEND_API_URL` - backend-ecommerce URL (for CSP/CORS allow-list)
+- `FRONTEND_APP_URL` - frontend-ecommerce URL (for CSP/CORS allow-list)
 - `CORS_ORIGINS` - Comma-separated list of allowed origins
 - `RATE_LIMIT_WINDOW_MS` - Rate limiting window in milliseconds
 - `RATE_LIMIT_MAX_REQUESTS` - Maximum requests per window
@@ -165,8 +168,8 @@ This repository is configured for easy deployment to Render using `render.yaml`:
 **Important:** Make sure your backend API is deployed first and update `js/config.js` with the correct backend URL.
 
 The admin dashboard connects to the backend API at:
-- **Development**: `http://localhost:3000`
-- **Production**: Update the URL in `js/config.js`
+- **Development**: `http://localhost:5000`
+- **Production**: `https://backend-ecommerce.onrender.com` (or your custom override)
 
 Configuration is automatic via `js/config.js` which detects the environment based on hostname.
 
@@ -180,9 +183,7 @@ Edit `js/config.js` and update the production API URL:
 
 ```javascript
 const ADMIN_CONFIG = {
-    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'
-        : 'https://YOUR-BACKEND-URL.onrender.com',  // ← Update this
+    API_BASE_URL: resolveApiBaseUrl(),
     // ...
 };
 ```
