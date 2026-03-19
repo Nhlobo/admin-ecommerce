@@ -1,21 +1,36 @@
 /**
  * Admin Dashboard Configuration
- * Configure the backend API URL here
- * 
- * IMPORTANT: Update the production API URL before deployment!
- * Replace 'https://backend-ecommerce-5-42p4.onrender.com' with your actual backend URL
+ *
+ * Backend URL resolution order:
+ * 1) window.__ADMIN_CONFIG__.API_BASE_URL (runtime injection)
+ * 2) localStorage "adminApiBaseUrl" (manual override for testing)
+ * 3) Environment defaults (localhost in dev, Render in prod)
  */
 
-// Backend API Configuration
-// For development: http://localhost:3000
-// For production: Update the URL below to match your deployed backend
+const DEFAULT_DEV_API_BASE_URL = 'http://localhost:5000';
+const DEFAULT_PROD_API_BASE_URL = 'https://backend-ecommerce.onrender.com';
+
+function normalizeBaseUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    return url.trim().replace(/\/+$/, '');
+}
+
+function resolveApiBaseUrl() {
+    const runtimeConfigUrl = normalizeBaseUrl(window.__ADMIN_CONFIG__?.API_BASE_URL);
+    if (runtimeConfigUrl) return runtimeConfigUrl;
+
+    const localOverrideUrl = normalizeBaseUrl(localStorage.getItem('adminApiBaseUrl'));
+    if (localOverrideUrl) return localOverrideUrl;
+
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    return isLocalhost ? DEFAULT_DEV_API_BASE_URL : DEFAULT_PROD_API_BASE_URL;
+}
+
 const ADMIN_CONFIG = {
     API_PREFIX: '/api',
-    
-    // ⚠️ CONFIGURATION REQUIRED: Update this URL to your deployed backend
-    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'  // Development
-        : 'https://backend-ecommerce-5-42p4.onrender.com',  // Production - UPDATE THIS!
+
+    // Can be overridden with window.__ADMIN_CONFIG__.API_BASE_URL or localStorage.setItem('adminApiBaseUrl', '<url>')
+    API_BASE_URL: resolveApiBaseUrl(),
     
     // API Endpoints
     ENDPOINTS: {
@@ -114,7 +129,7 @@ const ADMIN_CONFIG = {
 };
 
 // Log backend URL for verification
-console.log('🔗 Admin Dashboard connecting to backend:', ADMIN_CONFIG.API_BASE_URL);
+console.log('🔗 Admin Dashboard backend URL:', ADMIN_CONFIG.API_BASE_URL);
 
 // Helper function to get full API URL
 function getApiUrl(endpoint) {
